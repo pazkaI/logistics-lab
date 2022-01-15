@@ -7,6 +7,7 @@
 | SimpleShortestPaths.java |   7,888.60 |    2,621.53 |    1,633.48 | instant  |
 | SimpleRoute.py           |   7,757.18 |    2,612.26 |    1,577.01 | instant  |
 | ruin-and-recreate        |   6,995.31 |    2,324.02 |    1,389.65 | ~ 90s    |
+| IMSA                     |        tbd |         tbd |         tbd | tbd      |
 
 ## Aufgabe 2
 
