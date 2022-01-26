@@ -1,0 +1,66 @@
+\documentclass[ngerman]{tudscrreprt}
+\iftutex
+\usepackage{fontspec}
+\else
+\usepackage[T1]{fontenc}
+\usepackage[ngerman=ngerman-x-latest]{hyphsubst}
+\fi
+\usepackage{babel}
+\usepackage[german]{isodate}
+
+\newcommand{\code}[1]{\texttt{#1}}
+
+\begin{document}
+\faculty{Fakultät Maschinenwe­sen}
+\institute{Institut für Technische Logistik und Arbeitssyste­me}
+\chair{Professur für Technische Logistik}
+\date{2022-03-05}
+\author{%
+Pascal%
+\matriculationnumber{12345678}%
+\and%
+Nico%
+\matriculationnumber{87654321}%
+\and%
+Ferdinand Thiessen%
+\matriculationnumber{87654321}%
+}
+\title{Logistics Lab}
+\subtitle{Bericht Gruppe 6}
+\maketitle
+
+\tableofcontents
+
+\chapter{Aufgabe 1}
+Aufgabenstellung: Erstellen Sie ein Konzept zur Berechnung eines gültigen sowie möglichst optimalen Einsatzplanes der Fahrzeuge.
+
+\chapter{Aufgabe 2}
+\section{Initiale Probleme}
+Bei der Umsetzung von Aufgabe 2 wurde zur Programmierung von der hauseigenen Lego Software abgesehen.
+
+Leider wollte uns die Benutzung des \code{repeat until}-Blockes, welcher eine while-Schleife abbilden soll, nicht gelingen.
+Sowohl die Bedingung $x < y$ als auch $x > y$ führten nicht zum gewünschten Verhalten.
+Nur bei $x = y$ zeigte der Roboter eine Reaktion.
+
+Da das Programm die Motoren Rotation allerdings in zu großen Abständen abtastet, wurde nie exakt die 2-Meter-Marke gemessen und somit überfahren.
+Aufgrund dessen wurde nach einer Alternative gesucht. Der Hinweis der Tutoren, die alte Softwareversion zu benutzen, kam leider zu spät.
+
+Das MicroPython Package, welches ebenfalls von Lego bereitgestellt wird, bot sich hierfür bestens an.
+Außerdem ermöglichte das eine einfachere Einarbeitung durch Python-Vorkenntnisse, verständlicheren Code und Kollaboration durch Git.
+
+
+\section{Experiment 1: Freie Fahrt}
+\subsection{Aufgabenstellung}
+Das Fahrzeug soll ohne weitere Sensorik eine Strecke von 2 m geradeaus
+zurücklegen
+
+\subsection{Herangehensweise}
+Die Geschwindigkeit des Motors setzen wir initial auf $440$, da dies scheinbar die Maximalgeschwindigkeit ist.
+
+Um die zurückgelegte Strecke des Roboters zu ermitteln, muss die Rotation des Motors gemessen werden.
+Mit Hilfe der Funktion \code{motor.angle()} wird die Motorstellung, als Winkel, ausgelesen und kann
+mit Hilfe des Radumfangs in eine Strecke umgerechnet werden.
+
+\chapter{Aufgabe 3}
+
+\end{document}
