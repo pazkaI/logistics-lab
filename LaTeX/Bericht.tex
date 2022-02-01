@@ -7,17 +7,18 @@
 \fi
 \usepackage{babel}
 \usepackage[german]{isodate}
+\usepackage{setspace}
 
 \newcommand{\code}[1]{\texttt{#1}}
 
 \begin{document}
-\faculty{Fakultät Maschinenwe­sen}
-\institute{Institut für Technische Logistik und Arbeitssyste­me}
+\faculty{Fakultät Maschinenwesen}
+\institute{Institut für Technische Logistik und Arbeitssysteme}
 \chair{Professur für Technische Logistik}
 \date{2022-03-05}
 \author{%
-Pascal%
-\matriculationnumber{12345678}%
+Pascal Juppe%
+\matriculationnumber{4765520}%
 \and%
 Nico%
 \matriculationnumber{87654321}%
@@ -29,10 +30,30 @@ Ferdinand Thiessen%
 \subtitle{Bericht Gruppe 6}
 \maketitle
 
+\setstretch{1.25}
+
 \tableofcontents
 
 \chapter{Aufgabe 1}
 Aufgabenstellung: Erstellen Sie ein Konzept zur Berechnung eines gültigen sowie möglichst optimalen Einsatzplanes der Fahrzeuge.
+
+\section{Ruin and recreate}
+Ein weiterer Ansatz zur Berechnung eines möglichst optimalen Ablaufplans ist die Verwendung der Ruin-and-Recreate Strategie beschrieben durch Schrimpf et al. \cite{schrimpf} Dieser Algorithmus verwendet einen iterativen Ansatz, in dem zuerst Teile der Lösung entfernt werden (Ruin-Schritt) und nachfolgend wieder anders zusammengesetzt (Recreate-Schritt) werden. Bei der erneuten Zusammensetzung der Lösung wird dabei ein Ergebnis präferiert, welches eine beschriebene Zielfunktion maximiert - in unserem Anwendungsfall also eine Lösung, die die zurückgelegte Strecke aller Fahrzeuge (und damit die Gesamtausführungszeit des Ablaufplans) minimiert.
+
+Zur Implementation dieser Meta-Heuristik verwenden wir das Java-Framework jSprit, welches auf dem Grundalgorithmus beschrieben durch Schrimpf et al. basiert. Dazu werden unsere bereitgestellten Fahrzeuge durch Objekte der Klasse \textit{Vehicle} dargestellt. Diese werden mit einer Gesamtkapazität von 1 erstellt und initial an den korrespondierenden Maschinen positioniert. Die Transportanforderungen aus transport\_demand.txt werden in jSprit als Objekte der Klasse \textit{Shipment} abgebildet. Jedes Shipment hat eine Größe von 1, es werden also gegebenenfalls mehrere Shipments mit der gleichen Start- und Zielposition erstellt, wenn die Transportanforderungen dies vorgeben. Zusätzlich werden dem Algorithmus noch benutzerdefinierte Constraints vorgegeben, die eine Senkung der maximalen Transportzeit im Recreate-Schritt des Algorithmus bevorzugt. Der Algorithmus wird dann mit einer Obergrenze von 2000 Iterationen gestartet und terminiert in ca. 100 Sekunden. Die Lösungsgüte ist in Tabelle \ref{ruin-and-recreate} abgebildet:
+
+\begin{table}[]
+    \centering
+    \begin{tabular}{|c|c|}
+    \hline
+    Anzahl Fahrzeuge & Berechneter Score \\ \hline
+    1                & 6,995.31          \\ \hline
+    3                & 2,324.02          \\ \hline
+    5                & 1,389.65          \\ \hline
+    \end{tabular}
+    \caption{Ergebnisse ruin-and-recreate}
+    \label{ruin-and-recreate}
+\end{table}
 
 \chapter{Aufgabe 2}
 \section{Initiale Probleme}
@@ -62,5 +83,8 @@ Mit Hilfe der Funktion \code{motor.angle()} wird die Motorstellung, als Winkel, 
 mit Hilfe des Radumfangs in eine Strecke umgerechnet werden.
 
 \chapter{Aufgabe 3}
+
+\bibliographystyle{unsrt}
+\bibliography{bibliography}
 
 \end{document}
