@@ -1,6 +1,6 @@
 # Logistics Lab
 
-## Aufgabe 1
+## Runtime
 
 |                          | 1 Fahrzeug | 3 Fahrzeuge | 5 Fahrzeuge | Laufzeit |
 |--------------------------|------------|-------------|-------------|----------|
@@ -8,7 +8,3 @@
 | SimpleRoute.py           |   7,757.18 |    2,612.26 |    1,577.01 | instant  |
 | AdvancedRoute.py         |   7,165.10 |    2,425.26 |    1,462.75 | instant  |
 | ruin-and-recreate        |   6,995.31 |    2,324.02 |    1,389.65 | ~ 90s    |
-
-## Aufgabe 2
-
-## Aufgabe 3
