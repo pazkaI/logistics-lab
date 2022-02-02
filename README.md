@@ -1,6 +1,6 @@
 # Logistics Lab
 
-## Runtime
+## Ergebnisse und Laufzeit
 
 |                          | 1 Fahrzeug | 3 Fahrzeuge | 5 Fahrzeuge | Laufzeit |
 |--------------------------|------------|-------------|-------------|----------|
