@@ -9,6 +9,7 @@ __pycache__/
 *.blg
 *.fdb_latexmk
 *.fls
+*.out
 
 # SyncTeX
 *.synctex.gz

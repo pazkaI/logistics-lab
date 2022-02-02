@@ -8,6 +8,12 @@
 \usepackage{babel}
 \usepackage[german]{isodate}
 \usepackage{setspace}
+\usepackage{float}
+\usepackage{gensymb}
+\usepackage{amsmath}
+\usepackage{siunitx}
+\usepackage{csquotes}
+\usepackage[hidelinks]{hyperref}
 
 \newcommand{\code}[1]{\texttt{#1}}
 
@@ -15,12 +21,12 @@
 \faculty{Fakultät Maschinenwesen}
 \institute{Institut für Technische Logistik und Arbeitssysteme}
 \chair{Professur für Technische Logistik}
-\date{2022-03-05}
+\date{2022-03-04}
 \author{%
 Pascal Juppe%
 \matriculationnumber{4765520}%
 \and%
-Nico%
+Nico Müller%
 \matriculationnumber{87654321}%
 \and%
 Ferdinand Thiessen%
@@ -32,6 +38,7 @@ Ferdinand Thiessen%
 
 \setstretch{1.25}
 
+\setcounter{tocdepth}{1}
 \tableofcontents
 
 \chapter{Aufgabe 1}
@@ -40,9 +47,9 @@ Aufgabenstellung: Erstellen Sie ein Konzept zur Berechnung eines gültigen sowie
 \section{Ruin and recreate}
 Ein weiterer Ansatz zur Berechnung eines möglichst optimalen Ablaufplans ist die Verwendung der Ruin-and-Recreate Strategie beschrieben durch Schrimpf et al. \cite{schrimpf} Dieser Algorithmus verwendet einen iterativen Ansatz, in dem zuerst Teile der Lösung entfernt werden (Ruin-Schritt) und nachfolgend wieder anders zusammengesetzt (Recreate-Schritt) werden. Bei der erneuten Zusammensetzung der Lösung wird dabei ein Ergebnis präferiert, welches eine beschriebene Zielfunktion maximiert - in unserem Anwendungsfall also eine Lösung, die die zurückgelegte Strecke aller Fahrzeuge (und damit die Gesamtausführungszeit des Ablaufplans) minimiert.
 
-Zur Implementation dieser Meta-Heuristik verwenden wir das Java-Framework jSprit, welches auf dem Grundalgorithmus beschrieben durch Schrimpf et al. basiert. Dazu werden unsere bereitgestellten Fahrzeuge durch Objekte der Klasse \textit{Vehicle} dargestellt. Diese werden mit einer Gesamtkapazität von 1 erstellt und initial an den korrespondierenden Maschinen positioniert. Die Transportanforderungen aus transport\_demand.txt werden in jSprit als Objekte der Klasse \textit{Shipment} abgebildet. Jedes Shipment hat eine Größe von 1, es werden also gegebenenfalls mehrere Shipments mit der gleichen Start- und Zielposition erstellt, wenn die Transportanforderungen dies vorgeben. Zusätzlich werden dem Algorithmus noch benutzerdefinierte Constraints vorgegeben, die eine Senkung der maximalen Transportzeit im Recreate-Schritt des Algorithmus bevorzugt. Der Algorithmus wird dann mit einer Obergrenze von 2000 Iterationen gestartet und terminiert in ca. 100 Sekunden. Die Lösungsgüte ist in Tabelle \ref{ruin-and-recreate} abgebildet:
-
-\begin{table}[]
+Zur Implementation dieser Meta-Heuristik verwenden wir das Java-Framework jSprit, welches auf dem Grundalgorithmus beschrieben durch Schrimpf et al. basiert. Dazu werden unsere bereitgestellten Fahrzeuge durch Objekte der Klasse \code{Vehicle} dargestellt. Diese werden mit einer Gesamtkapazität von 1 erstellt und initial an den korrespondierenden Maschinen positioniert. Die Transportanforderungen aus transport\_demand.txt werden in jSprit als Objekte der Klasse \code{Shipment} abgebildet. Jedes Shipment hat eine Größe von 1, es werden also gegebenenfalls mehrere Shipments mit der gleichen Start- und Zielposition erstellt, wenn die Transportanforderungen dies vorgeben. Zusätzlich werden dem Algorithmus noch benutzerdefinierte Constraints vorgegeben, die eine Senkung der maximalen Transportzeit im Recreate-Schritt des Algorithmus bevorzugt. Der Algorithmus wird dann mit einer Obergrenze von 2000 Iterationen gestartet und terminiert in ca. 100 Sekunden. Die Lösungsgüte ist in Tabelle \ref{table:ruin-and-recreate} abgebildet:
+%
+\begin{table}[H]
     \centering
     \begin{tabular}{|c|c|}
     \hline
@@ -52,37 +59,217 @@ Zur Implementation dieser Meta-Heuristik verwenden wir das Java-Framework jSprit
     5                & 1,389.65          \\ \hline
     \end{tabular}
     \caption{Ergebnisse ruin-and-recreate}
-    \label{ruin-and-recreate}
+    \label{table:ruin-and-recreate}
 \end{table}
 
 \chapter{Aufgabe 2}
 \section{Initiale Probleme}
-Bei der Umsetzung von Aufgabe 2 wurde zur Programmierung von der hauseigenen Lego Software abgesehen.
+Bei der Umsetzung von Aufgabe 2 wurde zur Programmierung von der hauseigenen Lego Software abgesehen. Leider wollte uns die Benutzung des \code{repeat until}-Blockes, welcher eine while-Schleife abbilden soll, nicht gelingen. Sowohl die Bedingung $x < y$ als auch $x > y$ führten nicht zum gewünschten Verhalten. Nur bei $x = y$ zeigte der Roboter eine Reaktion.
 
-Leider wollte uns die Benutzung des \code{repeat until}-Blockes, welcher eine while-Schleife abbilden soll, nicht gelingen.
-Sowohl die Bedingung $x < y$ als auch $x > y$ führten nicht zum gewünschten Verhalten.
-Nur bei $x = y$ zeigte der Roboter eine Reaktion.
+Da das Programm die Rotation der Motoren allerdings in zu großen Abständen abtastet, wurde nie exakt die 2-Meter-Marke gemessen und somit überfahren. Aufgrund dessen wurde nach einer Alternative gesucht. Der Hinweis der Tutoren, die alte Softwareversion zu benutzen, kam leider zu spät.
 
-Da das Programm die Motoren Rotation allerdings in zu großen Abständen abtastet, wurde nie exakt die 2-Meter-Marke gemessen und somit überfahren.
-Aufgrund dessen wurde nach einer Alternative gesucht. Der Hinweis der Tutoren, die alte Softwareversion zu benutzen, kam leider zu spät.
-
-Das MicroPython Package, welches ebenfalls von Lego bereitgestellt wird, bot sich hierfür bestens an.
-Außerdem ermöglichte das eine einfachere Einarbeitung durch Python-Vorkenntnisse, verständlicheren Code und Kollaboration durch Git.
+Das MicroPython Package, welches ebenfalls von Lego bereitgestellt wird, bot sich hierfür bestens an. Außerdem ermöglichte das eine einfachere Einarbeitung durch Python-Vorkenntnisse, verständlicheren Code und Kollaboration durch Verwendung von Git.
 
 
 \section{Experiment 1: Freie Fahrt}
 \subsection{Aufgabenstellung}
-Das Fahrzeug soll ohne weitere Sensorik eine Strecke von 2 m geradeaus
-zurücklegen
+Das Fahrzeug soll ohne weitere Sensorik eine Strecke von $\SI{2}{\m}$ geradeaus zurücklegen.
 
 \subsection{Herangehensweise}
-Die Geschwindigkeit des Motors setzen wir initial auf $440$, da dies scheinbar die Maximalgeschwindigkeit ist.
+Die Geschwindigkeit des Motors setzen wir initial auf $440$, da dies scheinbar die Maximalgeschwindigkeit ist. Um die zurückgelegte Strecke des Roboters zu ermitteln, muss die Rotation des Motors gemessen werden. Mit Hilfe der Funktion \code{motor.angle()} wird die Motorstellung in Grad ausgelesen und kann mit Hilfe des Radumfangs $d$ in eine Strecke umgerechnet werden.
+%
+\begin{equation}
+    \label{equation:2meterstrecke}
+    \begin{aligned}
+       d &= \SI{56}{\mm}\\
+       u &= \pi \cdot d \approx \SI{176}{\mm} \\
+       y &= \frac{\SI{2}{\m}}{u} \cdot 360\degree \approx 4092.6\degree
+    \end{aligned}
+ \end{equation}
+ %
+Nach Gleichung \ref{equation:2meterstrecke} entsprechen 2 Meter also ca. $4092.6\degree$.
 
-Um die zurückgelegte Strecke des Roboters zu ermitteln, muss die Rotation des Motors gemessen werden.
-Mit Hilfe der Funktion \code{motor.angle()} wird die Motorstellung, als Winkel, ausgelesen und kann
-mit Hilfe des Radumfangs in eine Strecke umgerechnet werden.
+\subsection{Herausforderungen bei der Problemstellung}
+Leider mussten wir feststellen, dass der errechnete Werte stark von der Realität abweicht. Nach einem Testlauf haben wir den Wert manuell auf $y = 3870\degree$ eingestellt. Wir ließen den Roboter mehrmals die Strecke abfahren und ermittelten dabei die benötigte Zeit per Stoppuhr und die Abweichung von der erwarteten Zielposition. Letzteres unterteilten wir in zwei Messreihen: Abweichung in der Länge, also ob der Roboter zu kurz oder übers Ziel hinaus gefahren ist. Und Abweichung in der Breite, also ob der Roboter nach links oder rechts lenkt.
+
+\subsection{Auswertung}
+Es gibt verschiedene Gründe für die Abweichung zwischen dem berechneten und gemessenen Gradmaß. Dazu zählen Messfehler sowohl beim Aufbau der Testumgebung als auch bei der Ermittlung des Raddurchmessers. Durch das Gewicht des Roboters kann außerdem der Reifen zusammengedrückt werden, was zu einer Veränderung des Raddurchmessers führt. Weiterhin erfolgt das Bremsen des Roboters nicht durch aktives Abbremsen, sondern durch Ausrollen der Motoren. Dadurch schaltet der Roboter bei Erreichen der gewünschten Radrotation $y$ zwar die Motoren ab, kommt jedoch erst ein paar Zentimeter später zum Stehen. Letztlich können auch Fehler bei der Startaufstellung des Roboters, wie bspw. Über- oder Unterschreiten der Startlinie und der initialen Stellung des Hinterrads auftreten.
+
+Tabelle \ref{table:zeitmessung} zeigt die Ergebnisse der Zeitmessung. Die Streuung der Messergebnisse ist sehr klein und ist wahrscheinlich stark von Messfehlern beeinträchtigt, sodass wir 10 Zeitmessungen als ausreichend empfanden und wir uns keine neuen Erkenntnisse von weiteren Messungen erhofften.
+%
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|}
+    \hline
+    Mean               & $\SI{5,65}{\s}$ \\ \hline
+    Standardabweichung & $\SI{0,09}{\s}$ \\ \hline
+    Min                & $\SI{5,47}{\s}$ \\ \hline
+    Max                & $\SI{5,78}{\s}$ \\ \hline
+    \end{tabular}
+    \caption{Zeitmessung}
+    \label{table:zeitmessung}
+\end{table}
+%
+Tabelle \ref{table:laengenabweichung} stellt die Abweichung von der erwarteten Zielposition in der Länge dar. Ein optimales Ergebnis wird hier mit $\SI{0}{\mm}$ repräsentiert, während negative Werte für zu kurze Fahrten und positive Werte für zu lange Fahrten stehen. Den stärksten Fehlereinfluss auf die Streuung hier hat wahrscheinlich die Variation der initiale Startposition des Roboters.
+%
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|}
+    \hline
+    Mean               & $\SI{-10,18}{\mm}$ \\ \hline
+    Standardabweichung & $\SI{3,24}{\mm}$ \\ \hline
+    Min                & $\SI{-19}{\mm}$ \\ \hline
+    Max                & $\SI{-3}{\mm}$ \\ \hline
+    \end{tabular}
+    \caption{Längenabweichung}
+    \label{table:laengenabweichung}
+\end{table}
+%
+Die Verteilung der Daten, wie im Histogramm in Abbildung \ref{figure:laengenverteilung} zu sehen, lässt auf eine annähernde Normalverteilung der Messwerte schließen. Diese Erkenntnis kann genutzt werden, um den Roboter erneut zu kalibrieren. Diese kleine Abweichung konnte bei der initialen Kalibrierung nur schwer bemerkt werden, summiert sich allerdings bei hoher Anzahl an Fahrten auf uns sorgt für Probleme und Ineffizienzen.
+%
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.5]{images/laengenverteilung.png}
+    \caption{Längenverteilung}
+    \label{figure:laengenverteilung}
+\end{figure}
+%
+Tabelle \ref{table:breitenabweichung} stellt die Abweichung von der erwarteten Zielposition in der Breite dar. Ein optimales Ergebnis wird wieder mit $\SI{0}{\mm}$ repräsentiert, während negative Werte für eine Linkslenkung und positive Werrte für eine Rechtslenkung stehen.
+%
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|}
+    \hline
+    Mean               & $\SI{-35,98}{\mm}$ \\ \hline
+    Standardabweichung & $\SI{31,15}{\mm}$ \\ \hline
+    Min                & $\SI{-121}{\mm}$ \\ \hline
+    Max                & $\SI{25}{\mm}$ \\ \hline
+    \end{tabular}
+    \caption{Breitenabweichung}
+    \label{table:breitenabweichung}
+\end{table}
+%
+Es liegen höchstwahrscheinlich die selben Gründe für Abweichung vor. Allerdings ist eine stärkere Streuung zu erkennen. Begründet werden kann dies mit dem Verhältnis von Längen- und Breitenabweichung. Mathematisch gesehen führt eine Abweichung von $\SI{100}{\mm}$ zu einer Fahrtstrecke von $\SI{2002,5}{\mm}$, bevor der Roboter die Ziellinie überquert. Dabei wird eine gerade Strecke angenommen. Sollte einer der Motoren weniger Leistung als der andere liefern, führt das zu einer Kurvenfahrt. Dies könnte man überprüfen, indem man Messwerte auf halber Strecke oder noch öfter ermittelt. Da der Roboter per Programmierung nur 2 Meter zurückgelegt, führt das zu einer Längenabweichung von $\SI{2,5}{\mm}$. Der Verhältnis von Längen- zu Breitenabweichung beträgt also $1:40$.
+
+Auch im Histogramm in Abbildung \ref{figure:breitenverteilung} lässt sich eine Normalverteilung der Messwerte erkennen. Wie auch bei der Längenabweichung kann diese Erkenntnis zur nachträglichen Kalibrierung genutzt werden. Da man aber annehmen kann, dass sich die Startposition über viele Versuche hinweg mittelt, wird klar, dass der Roboter womöglich einen leichten Linksdrall hat. Auch das kann bei der Kalibrierung berücksichtigt werden. Möglicherweise liegt aber auch ein technischer Defekt oder Verschleiß vor. Des Weiteren besteht trotz Kalibrierung eine große Streuung. Dies kann ausschließlich gelöst werden, indem der Roboter sich per Sensorik an der Linie orientiert. 
+%
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.5]{images/breitenverteilung.png}
+    \caption{Längenverteilung}
+    \label{figure:breitenverteilung}
+\end{figure}
+
+\section{Experiment 2: Folgen einer Spur}
+\subsection{Aufgabenstellung}
+Das Fahrzeug soll mit seiner Sensorik eine Strecke von $\SI{2}{\m}$ geradeaus zurücklegen.
+
+\subsection{Herangehensweise}
+Für diese Aufgabe muss der Farbsensor des Roboters einbezogen werden. Um die Messwerte des Sensors in die Programmierung des Roboters mit einzubeziehen, wurde ein Proportional-Controller genutzt. Ein PID-Controller würde vermutlich für kaum merkbare Verbesserung sorgen, steigert die Komplexität allerdings extrem. Damit der Farbsensor möglichst aussagekräftige und unterscheidbare Werte liefert, nutzen wir weißes Tape auf einem schwarzen Tisch, was für starke Kontraste sorgt.
+
+\subsection{Herausforderungen bei der Problemlösung}
+Die größte Schwierigkeit bei dieser Aufgabe besteht in der Kalibrierung des P-Controllers. Allerdings lässt sich bei nur einer Regelgröße relativ schnell ein geeigneter Parameter finden. Ein weiteres Problem stellt der Lichteinfall dar. Durch Sonneneinstrahlung oder Lampenreflektion könnten die Sensormesswerte verfälscht werden. Am besten lässt sich das Experiment vermutlich im Dunkeln durchführen, da der Sensor sein eigenes Licht mitbringt. Bereits genannte Gründe für Abweichung kommen auch hier wieder zum tragen, wobei der Roboter Ungenauigkeiten in der Startposition relativ schnell kompensieren kann.
+
+\subsection{Auswertung}
+Tabelle \ref{table:zeitmessung2} zeigt die Ergebnisse der Zeitmessung. Auch hier ist die Streuung sehr klein und wahrscheinlich stark von Messfehlern abhängig. Jedoch lässt sich eine minimale Verbesserung zu den Werten des ersten Experiments feststellen. Dies würde sich mit einer geringeren Abweichung von der erwarteten Zielposition erklären lassen.
+%
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|}
+    \hline
+    Mean               & $\SI{5,65}{\mm}$ \\ \hline
+    Standardabweichung & $\SI{0,08}{\mm}$ \\ \hline
+    Min                & $\SI{5,52}{\mm}$ \\ \hline
+    Max                & $\SI{5,78}{\mm}$ \\ \hline
+    \end{tabular}
+    \caption{Zeitmessung}
+    \label{table:zeitmessung2}
+\end{table}
+
+\section{Experiment 3: Umfahren eines Hindernisses}
+\subsection{Aufgabenstellung}
+Das Fahrzeug soll mit Hilfe seiner Sensorik eine definierte Strecke abfahren und dabei ein fiktives Hindernis umfahren.
+
+\subsection{Herangehensweise}
+Theoretisch besitzt der Roboter bereits alle nötigen Fähigkeiten, um auch einer abbiegenden Linie zu folgen. Allerdings wird ihn die Geschwindigkeit aus der Bahn werfen. Zu testen wäre also die größtmögliche Geschwindigkeit, bei der der Kurs verlässlich abgefahren werden kann. Diese Geschwindigkeit kann dann mit dem Erweitern des P-Controller zu einem PID-Controller verbessert werden.
+
+\subsection{Herausforderungen bei der Problemlösung}
+Die richtigen Parameter für einen PID-Controller zu finden stellt sich als äußerst komplex dar. Scheinbar gibt es dabei auch keine Best-Practices sondern man muss einfach probieren. \enquote{Verlässliche} Einstellungen des Roboters definieren wird so, dass er den Kurs zehn mal in Folge erfolgreich absolvieren muss.
+
+\subsection{Auswertung}
+Für die Testläufe mit dem P-Controller erreichten wir eine maximale Geschwindigkeit von $100$. Diese konnten wir mit dem PID-Controller auf $140$ verbessern. Der Roboter absolvierte auch einzelne Testläufe mit höheren Geschwindigkeiten erfolgreich, jedoch nicht zuverlässig.
+
+Tabelle \ref{table:zeitmessung3} enthält die Ergebnisse der Zeitmessung, auch hier liegen die Messergebnisse wieder stark beieinander. Allerdings unterscheiden sie sich, wie erwartet, stark von den vorherigen Experimenten. Mean und Standardabweichung haben sich in etwa verdoppelt.
+%
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|}
+    \hline
+    Mean               & $\SI{13,53}{\mm}$ \\ \hline
+    Standardabweichung & $\SI{0,13}{\mm}$ \\ \hline
+    Min                & $\SI{13,26}{\mm}$ \\ \hline
+    Max                & $\SI{13,71}{\mm}$ \\ \hline
+    \end{tabular}
+    \caption{Zeitmessung}
+    \label{table:zeitmessung3}
+\end{table}
+%
+Weitere Optimierung sind möglich, indem man die Parameter des PID-Controllers verbessert. Jedoch ist nicht klar, wann ein Optimum erreicht ist und kann somit unendlich viel Zeit kosten. Des Weiteren hätte der Roboter einen Vorteil, wenn die Abbiegungen der Strecke eher Kurven wären oder zumindest einen stumpferen Winkel hätten. Leider kann der Roboter in diesem Versuchsaufbau keinen Nutzen aus seinem Ultraschallsensor ziehen. Sollte er auf ein Hindernis zufahren, würde er dies frühzeitig erkennen, seine Geschwindigkeit reduzieren, die Kurve sauber fahren und danach wieder beschleunigen. Falls in einem realen Szenario kein Hindernis im Weg sein sollte, sondern ausschließlich Einschränkungen der Route, könnte man dies dem Roboter über eine Karte, Matrix oder einen Graphen mitteilen, sodass er ebenfalls im Voraus auf Kurven reagieren kann.
 
 \chapter{Aufgabe 3}
+In der Aufgabenstellung werden Annahmen getroffen, welches das gesamte Konzept simplifizieren. Im Folgenden wollen wir betrachten, welche möglichen Auswirkungen die Realität auf das gegebene Szenario hat, wenn also diese Annahmen nicht mehr gemacht werden können.
+
+\section{Platzbedarf}
+\begin{displayquote}
+    ``Es befinden sich keine statischen oder dynamischen Hindernisse im Layout. [...] Die gesamte Fläche ist befahrbar. [...] Alle Fahrzeuge fahren auf direktem Weg zwischen den Maschinen (euklidische Distanz).'' \cite{aufgabenstellung}
+\end{displayquote}
+%
+Ein Unternehmen, welches autonome Transportsysteme so effizient wie möglich einsetzen möchte, wird sicherlich auch den zur Verfügung stehenden Platz in ihrer Logistikhalle sinnvoll nutzen wollen. Flächen frei zu lassen, nur damit die Fahrzeug nicht mit Hindernissen kollidieren können, stellt sich in den meisten Fällen wahrscheinlich aus unökonomisch heraus. Dynamische Hindernisse im Sinne anderer Roboter kann vergleichsweise einfach gelöst werden, indem die Fahrzeuge die Positionen der anderen Fahrzeuge übermittelt bekommen und dementsprechend reagieren können. Menschen als dynamische Hindernisse stellen sich womöglich als größeres Problem dar. Moderne Kamerasysteme können evtl. visuell ihre Umgebung wahrnehmen, Personen erkennen und bremsen bzw. ausweichen, jedoch ist das mit großen Kosten für Technik verbunden und das System muss einwandfrei funktionieren um Arbeitsunfälle zu vermeiden. Sollten Kamerasysteme solcher Art nicht zum Einsatz kommen, gebietet der Arbeitsschutz eine klare, mindestens visuelle, Abtrennung des Bereiches für die Fahrzeuge und des begehbaren Bereiches für Personen. Die kollidiert allerdings wiederum mit der Annahme, die gesamte Fläche sei befahrbar. Eine Mögliche Lösung wäre, das Transportsystem auf eine tiefer oder höher liegende Ebene zu verlegen. Somit wäre zumindest die Fahrzeug- und Personendomäne getrennt.
+
+\section{Auftragszeit und -reihenfolge}
+\begin{displayquote}
+    ``Ein einzelner Auftrag hat keinen bestimmten Liefer- oder Abholzeitpunkt. [...] Die Aufträge sind homogen, d.h. es liegen keine geforderte Reihenfolge oder Priorisierung vor.'' \cite{aufgabenstellung}
+\end{displayquote}
+%
+Bei Unternehmen, in denen 24/7 gearbeitet wird, muss der Auftragspool entweder nach einer gewissen Zeit abgearbeitet sein und dann neu gestartet werden, was mit Overhead und damit Ineffizienz verbunden ist. Oder die zu transportierenden Güter bekommen ein weiteres Deadline-Attribut, welches im Scheduling-Algorithmus mit einbezogen werden muss. Unternehmen, bei denen das nicht der Fall ist, könnten ihren Zeithorizont der Arbeitszeit anpassen. Das bedeutet, am Ende des Tages ist der Aufgabenpool abgearbeitet. Allerdings können das zwischendrin keine neuen Aufträge eingepflegt werden und man kann nicht erwarten, dass bestimmt Aufträge eher feritg werden als andere. Dafür müssten diese Unternehmen dann ebenfall den Auftragspool neu starten oder Prioritäten vergeben.
+
+\section{Treibstoff und Verschleiß}
+\begin{displayquote}
+    ``Fahrzeuge sind zu 100\% einsatzbereit und fallen nie aus. [...] Fahrzeuge haben eine unendliche Reichweite, können also unendlich weit/lange fahren.'' \cite{aufgabenstellung}
+\end{displayquote}
+%
+Da Verschleiß und Energievorrat immer eine Rollen spielen, kommt es in der Realität unvermeidlich zu Ausfällen. Selbst bei unseren Experimenten in Aufgabe 2 ist während der Durchführung der Roboter wegen zu niedrigem Akkustand ausgefallen. Man kann dies natürlich mit zusätzlicher Sensorik überwachen um rechtzeitig den Roboter zu warten. Allerdings bedeutet das an sich schon einen Ausfall für den Roboter und ist zusätzlich mit Hardware- und Personalkosten verbunden.
+
+\section{Be- und Entladezeiten}
+\begin{displayquote}
+    ``Es fallen keine Tot-, Neben- und Handhabungszeiten an.'' \cite{aufgabenstellung}
+\end{displayquote}
+%
+Natürlich ist in der Realität das Be- und Entladen mit einem gewissen Zeitaufwand verbunden. Diesen kann man allerdings minimal und über verschiedene Maschinen hinweg gleich halten, wenn ein effizientes Be- und Entladungssystem zum Einsatz kommt.
+
+\section{Fahrzeugkollisionen}
+\begin{displayquote}
+    ``Die Fahrzeuge sind dimensionslos, d.h. Es finden keine Konflikte zwischen den Fahrzeugen statt, womit keine Ausweichmanöver von Nöten sind.'' \cite{aufgabenstellung}
+\end{displayquote}
+%
+Wie die bereitgestellten Videos der Simulation gezeigt haben, ist diese Annahme weit von der Realität entfernt. Es wurden dabei ausschließlich Beschleunigung und Dimension der Roboter einbezogen, was bereits zu einer 16\% - 65\% längeren Bearbeitungszeit führt. Bei der Kollisionsdetektions und des Ausweichmanövern gibt es evtl. noch etwas Verbesserungspotential. Des Weiteren könnte man einen Parameter hinzufügen, welcher die Anzahl an Kollisionen zählt und vom Algorithmus minimiert werden sollte. Jedoch führt eine minimal Kollisionszahl wahrscheinlich nicht immer zu besseren Zeiten, da die Roboter dann Umwege fahren müssten.
+
+\section{Machinenkollisionen}
+\begin{displayquote}
+    ``Die Maschinen sind dimensionslos, d.h. die Fahrzeuge fahren exakt zu den angegebenen Koordinaten der Maschinen, um ein Transportgut aufzunehmen oder abzugeben.'' \cite{aufgabenstellung}
+\end{displayquote}
+%
+Mit hoher Wahrscheinlichkeit muss der Roboter in der Realität auch mal die ein oder andere Maschine umfahren. Wie die Erkenntnisse aus Aufgabe 2 zeigen, benötigt der Roboter beim Umfahren von Hindernissen im Vergleich zu einer geraden Strecke mindestens das 2,5fache der Zeit. Allerdings spielt die Dimension der Maschinen bei dem gegebenen Hallenlayout, und auch bei ähnlichen Layouts, eine relativ geringe Rolle. Die Koordinaten sind mehr oder weniger kreisförmig angeordnet, sodass eine Kollision mit einer Maschine womöglich vermieden werden kann, wenn sich die Roboter nur im Kreisinneren aufhalten. Allerdings führt, wie bereits beschrieben, ein möglichst freier Raum auf den Routen der Roboter zu großem Platzbedarf und somit erhöhten Kosten und Ineffizienzen.
+
+\section{Beschleunigung}
+\begin{displayquote}
+    ``Fahrzeuge fahren durchgängig mit der maximalen Geschwindigkeit von 1 Streckeneinheit/Zeit.'' \cite{aufgabenstellung}
+\end{displayquote}
+%
+Aus hier gibt die Simulation Aufschluss über das Verhalten in der Realität. Wie viel des zusätzlichen Zeitbedarfs jeweils der Beschleunigung oder dem Kollidieren der Roboter zuzuschreiben ist, lässt sich schwer sagen. Fakt ist jedoch, das positive und negative Beschleunigung Zeit kosten. Mit stärkere Motorisierung und besseren Bremsen könnte dies verbessert werden, doch auch hier spielt die Kostenabwägung einer entscheidende Rolle. Ebenso zeigen die Ergebnisse der Experimente, dass ein Abbremsen vor dem Umfahren eines Hindernisses zu besseren Resultaten führt. Das würde natürlich die Anzahl an Beschleunigungsmanövern erneut erhöhen und müsste mit der Gesamtzeitersparnis ins Verhältnis gesetzt werden.
+
+\section{Größe der Fahrzeugflotte}
+Die Ergebnisse in Aufgabe 1 deuten auf eine lineare Abnahme der Zeit mit steigender Roboteranzahl hin. Ein Fahrzeug pro Auftrag wäre also mit den getroffenen Annahmen die optimale Lösung. Jedoch werden viele der bereits genannten Probleme mit steigender Anzahl von Fahrzeugen verstärkt, sodass ab einer bestimmten Zahl die benötigte Zeit nicht mehr abnimmt und unter Umständen sogar steigt. Auch die Erhöhung der Maschinenanzahl kann hier nur bedingt Abhilfe schaffen, da sich dennoch viele Routen der Roboter kreuzen und die Kollisionsanzahl hoch bleibt.
 
 \bibliographystyle{unsrt}
 \bibliography{bibliography}
