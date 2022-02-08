@@ -61,7 +61,7 @@ Die Strategie wurde mittels JAVA umgesetzt, hierfür wurden keine externen
 Bibliotheken benötigt.
 
 Zuerst werden die Maschinen mit ihren Koordinaten angelegt und die Aufträge aus
-der enstprechenden Datei gelesen, danach wird jedem Fahrzeug der Auftrag mit der kürzesten Strecke, ausgehend von seiner Startposition zugewiesen.
+der entsprechenden Datei gelesen, danach wird jedem Fahrzeug der Auftrag mit der kürzesten Strecke, ausgehend von seiner Startposition zugewiesen.
 Nun werden die Aufträge mittels einer \emph{WHILE}-Schleife abgearbeitet,
 daher jede Iteration wird das Fahrzeug, welches am nächsten an seinem Ziel ist zu diesem
 bewegt und dort der nächste Auftrag ausgewählt, dafür wird die euklidische Distanz zwischen
@@ -69,8 +69,10 @@ Ziel- und Startposition berechnet.
 
 
 \subsection{Ergebnisse}
-Die Implementation liefert das Ergebnis auf Grund des simplen Algorithmus ohn spürbare
-Verzögerung, die Lösungsgüte ist in Tabell \ref{table:shortest-paths} abgebildet:
+Die Implementation liefert das Ergebnis auf Grund des simplen Algorithmus ohne spürbare
+Verzögerung, gemessen wurde eine Ausführungszeit von $\approx \SI{0.818}{\second}$.
+
+Die Lösungsgüte ist in Tabelle \ref{table:shortest-paths} abgebildet.
 
 \begin{table}[H]
     \centering
@@ -92,11 +94,88 @@ jedoch setzt dieser Ansatz auf einer verbesserte Heuristik mit weiteren
 Parametern neben der Distanz.
 
 \subsection{Strategie}
+Im wesentlichen besteht dieser Ansatz aus zwei Schritten, der Bewegung und Ausführung eines Auftrags, sowie der Wahl eines neuen Auftrags, wie im Diagramm \ref{figure:greedy-diagram} zu sehen.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.5]{images/greedy-diagram}
+    \caption{Ablauf Greedy Ansatz}
+    \label{figure:greedy-diagram}
+\end{figure}
+
+Im ersten Schritt wird das Fahrtzeug mit der geringsten Distanz zu seinem Ziel gewählt (hat es kein Ziel ist die Distanz \num{0}) und alle Fahrzeuge um diese Distanz bewegt und
+geprüft ob ihre jeweiligen Aufträge nun erfüllt sind.
+
+Im nächsten Schritt wird für alle Fahrzeuge welche keinen aktiven Auftrag haben ein nächster
+Auftrag ausgewählt. Dieser Schritt unterscheidet sich von dem vorherigen Ansatz,
+da hier nun neben der Distanz zwischen Start- und Zielposition des Auftrags auch
+das Vorhandensein eines Anschlussauftrags als Parameter für die Heuristik herangezogen wird.
+Daher gibt es an der aktuellen Maschine Aufträge, wird der Auftrag ausgewählt, welcher
+an seinem Ziel einen Folgeauftrag hat.
+Sollte es keine Aufträge an der aktuellen Maschine geben, wird die nächste Maschine angesteuert,
+welche noch Aufträge hat.
+
+\subsubsection{Verbesserte Heuristik}
+Während der Implementation der Strategie hatte sich gezeigt, dass eine Optimierung der
+Heuristik möglich ist, hierfür wurde diese wie folge angepasst:
+
+Statt einfach nur danach zu sortieren ob ein Auftrag einen Folgeauftrag hat,
+wird ein Auftrag bewertet nach der Anzahl möglicher Folgeaufträge, daher ein Auftrag
+an dessen Ziel mehr Folgeaufträge warten hat eine höhere Priorität.
+Sollte es trotzdem noch mehrere Aufträge mit der selben Priorität geben, daher der selben Anzahl
+Folgeaufträge, werden diese noch einmal sortiert nach der Distanz des Auftrags,
+daher bei gleicher Anzahl Folgeaufträge wird der Auftrag mit der kürzesten Distanz zwischen
+Start- und Zielposition gewählt.
+
+Des weiteren im Fall, dass eine Maschine keine Aufträge mehr hat, wird nicht mehr die nächste
+Maschine angefahren, sondern die Maschine mit den meisten offenen Aufträgen. Sollte es hier mehrere mit der gleichen Anzahl geben wird hier die Maschine gewählt, zu der aktuell kein
+anderes Fahrzeug unterwegs ist.
+
 
 \subsection{Implementierung}
+Der Ansatz wurde mittels \emph{Python} implementiert, die Umsetzung erfolgte größtenteils
+mit den mitgelieferten Paketen, einzig das \emph{numpy} Paket wurde zusätzlich verwendet
+um die Berechnung der Distanzen zu vereinfachen.
+
+Im ersten Schritt werden die Maschinen erzeugt, diese werden als einfach Tupel ihrer Koordinaten
+in einer Liste repräsentiert. Daher der Listenindex entspricht der \emph{ID} der Maschine.
+Des weiteren werden die Transportaufträge eingelesen und die Fahrzeuge erstellt, diese werden als Objekte mit den Attributen: ID, Position, Ziel, Distanz zum Ziel und ob sie Ladung transportieren repräsentiert.
+
+Danach werden, in einer \code{WHILE}-Schleife, die Aufträge abgearbeitet.
+Dies erfolgt, in dem das Fahrzeug mit der kürzesten Distanz zum Ziel ermittelt wird und
+alle Fahrzeuge um diese Distanz bewegt werden und alle aktiven Aufträge auf Erfüllung geprüft werden.
+Alle Fahrzeuge, welche nun keinen aktiven Auftrag mehr haben, werden nun mit einem neuen
+Auftrag versorgt, dazu werden die oberen Heuristiken verwendet.
+
+Dem Fahrzeug wird ein neues Ziel zugewiesen, sollte eine Fahrt mit Ladung erfolgen,
+wird dies im Fahrzeug gespeichert. Des weiteren wird für die spätere Ausgabe der Pfade,
+die Fahrt des Fahrzeugs in der Ausgabeliste hinzugefügt.
+
+\subsubsection{Verbesserte Version}
+Um die verbesserte Heuristik zu Implementieren wurde die Implementierung der Fahrzeuge,
+Aufträge und Maschinen verändert.
+Für all diese Objekte wurden Klassen entworfen und Teile der Logik als Klassenmethoden
+implementiert, besonders die Implementierung der Fahrzeuge wurde angepasst, sodass jedes
+Fahrzeug nun eine Liste an aktuellen Aufträgen enthält, sowie eine Liste aller erledigter Aufträge.
+
+Ein wichtiger Unterschied zur vorhergehenden Version ist das Speichern eines Folgeauftrages
+im Falle eines Maschinenwechsels. Daher ein Fahrzeug, welches von einer Maschine, welche keine offenen Aufträge mehr hat, zu einer anderen Maschine unterwegs ist, blockt bereits den dortigen Folgeauftrag.
+
+Somit wird der Fall umgangen, dass ein Fahrzeug zu einer Maschine fährt um dort einen Auftrag
+anzunehmen, jedoch ein anderes Fahrzeug schneller war und den Auftrag bereits angenommen hat.
+Dies würde sonst zu einer unnötigen Leerfahrt führen.
+
+Erfolgte Fahrten werden nun direkt im Fahrzeug gespeichert, somit werden am Ende für die Ausgabe
+die Fahrzeuge durch iteriert und die Liste ihrer Pfade direkt aus der jeweiligen Fahrzeug liste
+extrahiert.
+
+
 \subsection{Ergebnisse}
 Aufgrund des Greedy-Ansatzes liefert das Skript die Ergebnisse ohne spürbare Verzögerung,
-die Lösungsgüte ist in Tabelle \ref{table:greedy-paths} aufgezeigt.
+gemessen wurde eine Ausführungszeit von $\approx \SI{0.205}{\second}$
+für die erste Version, respektive $\approx \SI{0.251}{\second}$ für die Verbesserte.
+
+Die Lösungsgüte ist in Tabelle \ref{table:greedy-paths} aufgezeigt.
 \begin{table}[H]
     \centering
     \begin{tabularx}{\textwidth}{|*{4}{Y|}}
@@ -114,17 +193,17 @@ die Lösungsgüte ist in Tabelle \ref{table:greedy-paths} aufgezeigt.
 
 \section{Ansatz 3: Ruin and Recreate}
 \subsection{Strategie}
-Ein weiterer Ansatz zur Berechnung eines möglichst optimalen Ablaufplans ist die Verwendung der Ruin-and-Recreate Strategie beschrieben durch Schrimpf et al. \cite{schrimpf} Dieser Algorithmus verwendet einen iterativen Ansatz, in dem zuerst Teile der Lösung entfernt werden (Ruin-Schritt) und nachfolgend wieder anders zusammengesetzt (Recreate-Schritt) werden. Bei der erneuten Zusammensetzung der Lösung wird dabei ein Ergebnis präferiert, welches eine beschriebene Zielfunktion maximiert - in unserem Anwendungsfall also eine Lösung, die die zurückgelegte Strecke aller Fahrzeuge (und damit die Gesamtausführungszeit des Ablaufplans) minimiert.
+Ein weiterer Ansatz zur Berechnung eines möglichst optimalen Ablaufplans ist die Verwendung der \emph{Ruin-and-Recreate}-Strategie beschrieben durch Schrimpf et al. \cite{schrimpf} Dieser Algorithmus verwendet einen iterativen Ansatz, in dem zuerst Teile der Lösung entfernt werden (Ruin-Schritt) und nachfolgend wieder anders zusammengesetzt (Recreate-Schritt) werden. Bei der erneuten Zusammensetzung der Lösung wird dabei ein Ergebnis präferiert, welches eine beschriebene Zielfunktion maximiert - in unserem Anwendungsfall also eine Lösung, die die zurückgelegte Strecke aller Fahrzeuge (und damit die Gesamtausführungszeit des Ablaufplans) minimiert.
 
 \subsection{Implementierung}
 Zur Implementation dieser Meta-Heuristik verwenden wir das Java-Framework jSprit, welches auf dem Grundalgorithmus beschrieben durch Schrimpf et al. basiert. Dazu werden unsere bereitgestellten Fahrzeuge durch Objekte der Klasse \code{Vehicle} dargestellt. Diese werden mit einer Gesamtkapazität von 1 erstellt und initial an den korrespondierenden Maschinen positioniert. Die Transportanforderungen aus \emph{transport\_demand.txt} werden in jSprit als Objekte der Klasse \code{Shipment} abgebildet.
 
-Jedes Shipment hat eine Größe von 1, es werden also gegebenenfalls mehrere Shipments mit der gleichen Start- und Zielposition erstellt, wenn die Transportanforderungen dies vorgeben. Zusätzlich werden dem Algorithmus noch benutzerdefinierte Constraints vorgegeben, die eine Senkung der maximalen Transportzeit im Recreate-Schritt des Algorithmus bevorzugt. Der Algorithmus wird dann mit einer Obergrenze von \num{2000} Iterationen gestartet.
+Jedes \code{Shipment} hat eine Größe von \emph{1}, es werden also gegebenenfalls mehrere Shipments mit der gleichen Start- und Zielposition erstellt, wenn die Transportanforderungen dies vorgeben. Zusätzlich werden dem Algorithmus noch benutzerdefinierte Constraints vorgegeben, die eine Senkung der maximalen Transportzeit im Recreate-Schritt des Algorithmus bevorzugt. Der Algorithmus wird dann mit einer Obergrenze von \num{2000} Iterationen gestartet.
 
 \subsection{Ergebnisse}
 Die Laufzeit des Programms ist direkt abhängig von der Obergrenze der Iterationen,
 bei der gesetzten Obergrenze von \num{2000} Iterationen terminiert das Programm
-nach ca. 100 Sekunden.
+nach $\approx \SI{133.099}{\second}$.
 Die Lösungsgüte ist in Tabelle \ref{table:ruin-and-recreate} abgebildet:
 %
 \begin{table}[H]
@@ -141,7 +220,38 @@ Die Lösungsgüte ist in Tabelle \ref{table:ruin-and-recreate} abgebildet:
 \end{table}
 
 \section{Ergebnisdiskussion}
-%Die Ansätze 1 und 2 basieren beide auf einem
+Der erste und zweite Ansatz basieren jeweils auf einem Greedy-Ansatz, daher es wird bei jeder
+Station der zu diesem Moment beste Auftrag ausgewählt.
+Dies hat den Vorteil, dass beide Strategien theoretisch dynamisch sich an neue Aufträge anpassen
+können, somit könnten während der Fahrt neue Aufträge hinzugefügt oder entfernt werden.
+Dies birgt jedoch auch den Nachteil, dass diese Strategien keine optimale Lösung bieten.
+
+Im Vergleich dazu zeigt die dritte Strategie eine deutlich bessere Lösungsgüte,
+jedoch wieder mit dem Nachteil, das eine vorherige Berechnung stattfinden muss und eine
+Veränderung der Aufträge eine neue Berechnung zur Folge hätte.
+
+Somit hängt es vom Anwendungsfall ab, ob eine Berechnung im Voraus möglich ist oder
+ob ein Kompromiss bei der Lösungsgüte möglich ist.
+Vergleicht man die Ergebnisse so erkannt man in der Gegenüberstellung \ref{table:compare-strategies},
+dass der erste Greedy-Ansatz kaum eine Verbesserung gegenüber dem Kürzeste-Distanz Ansatz bringt.
+Jedoch die verbesserte Version beiden deutlich überlegen ist.
+Der \emph{Ruin-and-Recreate}-Ansatz ist noch um $\approx \SI{3.85}{\percent}$ besser als der
+zweite Greedy-Ansatz, jedoch auf Kosten einer um $\approx \SI{530}{\percent}$ höheren Laufzeit.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|r|r|r|}
+    \hline\centering
+    Strategie & \multicolumn{1}{c|}{1} & \multicolumn{1}{c|}{2.1} & \multicolumn{1}{c|}{2.2}
+                                                                                        \\ \hline
+    1         & 0                      & -                        & -                   \\ \hline
+    2.1       & \SI{ 1.83}{\percent}   & 0                        & -                   \\ \hline
+    2.2       & \SI{ 9.04}{\percent}   & \SI{ 7.35}{\percent}     & 0                   \\ \hline
+    3         & \SI{12.53}{\percent}   & \SI{10.91}{\percent}     & \SI{3.85}{\percent} \\ \hline
+    \end{tabular}
+    \caption{Verbesserung der Ergebnisse, gemittelt aus den Verbesserungen der jeweiligen Ergebnissen (ein, drei und fünf Fahrzeuge).}
+    \label{table:compare-strategies}
+\end{table}
 
 \chapter{Aufgabe 2}
 \section{Initiale Probleme}
@@ -174,7 +284,7 @@ Nach Gleichung \ref{equation:2meterstrecke} entsprechen 2 Meter also ca. \SI{409
 Leider mussten wir feststellen, dass der errechnete Werte stark von der Realität abweicht. Nach einem Testlauf haben wir den Wert manuell auf $y = \SI{3870}{\degree}$ eingestellt. Wir ließen den Roboter mehrmals die Strecke abfahren und ermittelten dabei die benötigte Zeit per Stoppuhr und die Abweichung von der erwarteten Zielposition. Letzteres unterteilten wir in zwei Messreihen: Abweichung in der Länge, also ob der Roboter zu kurz oder übers Ziel hinaus gefahren ist. Und Abweichung in der Breite, also ob der Roboter nach links oder rechts lenkt.
 
 \subsection{Auswertung}
-Es gibt verschiedene Gründe für die Abweichung zwischen dem berechneten und gemessenen Gradmaß. Dazu zählen Messfehler sowohl beim Aufbau der Testumgebung als auch bei der Ermittlung des Raddurchmessers. Durch das Gewicht des Roboters kann außerdem der Reifen zusammengedrückt werden, was zu einer Veränderung des Raddurchmessers führt. Weiterhin erfolgt das Bremsen des Roboters nicht durch aktives Abbremsen, sondern durch Ausrollen der Motoren. Dadurch schaltet der Roboter bei Erreichen der gewünschten Radrotation $y$ zwar die Motoren ab, kommt jedoch erst ein paar Zentimeter später zum Stehen. Letztlich können auch Fehler bei der Startaufstellung des Roboters, wie bspw. Über- oder Unterschreiten der Startlinie und der initialen Stellung des Hinterrads auftreten.
+Es gibt verschiedene Gründe für die Abweichung zwischen dem berechneten und gemessenen Gradmaß. Dazu zählen Messfehler sowohl beim Aufbau der Testumgebung als auch bei der Ermittlung des Raddurchmessers. Durch das Gewicht des Roboters kann außerdem der Reifen zusammengedrückt werden, was zu einer Veränderung des Raddurchmessers führt. Weiterhin erfolgt das Bremsen des Roboters nicht durch aktives Abbremsen, sondern durch Ausrollen der Motoren. Dadurch schaltet der Roboter bei Erreichen der gewünschten Radrotation $y$ zwar die Motoren ab, kommt jedoch erst ein paar Zentimeter später zum Stehen. Letztlich können auch Fehler bei der Startaufstellung des Roboters, wie beispielsweise Über- oder Unterschreiten der Startlinie und der initialen Stellung des Hinterrads auftreten.
 
 Tabelle \ref{table:zeitmessung} zeigt die Ergebnisse der Zeitmessung. Die Streuung der Messergebnisse ist sehr klein und ist wahrscheinlich stark von Messfehlern beeinträchtigt, sodass wir 10 Zeitmessungen als ausreichend empfanden und wir uns keine neuen Erkenntnisse von weiteren Messungen erhofften.
 %
@@ -215,7 +325,7 @@ Die Verteilung der Daten, wie im Histogramm in Abbildung \ref{figure:laengenvert
     \label{figure:laengenverteilung}
 \end{figure}
 %
-Tabelle \ref{table:breitenabweichung} stellt die Abweichung von der erwarteten Zielposition in der Breite dar. Ein optimales Ergebnis wird wieder mit $\SI{0}{\mm}$ repräsentiert, während negative Werte für eine Linkslenkung und positive Werrte für eine Rechtslenkung stehen.
+Tabelle \ref{table:breitenabweichung} stellt die Abweichung von der erwarteten Zielposition in der Breite dar. Ein optimales Ergebnis wird wieder mit $\SI{0}{\mm}$ repräsentiert, während negative Werte für eine Linkslenkung und positive Werte für eine Rechtslenkung stehen.
 %
 \begin{table}[H]
     \centering
@@ -312,7 +422,7 @@ Ein Unternehmen, welches autonome Transportsysteme so effizient wie möglich ein
     ``Ein einzelner Auftrag hat keinen bestimmten Liefer- oder Abholzeitpunkt. [...] Die Aufträge sind homogen, d.h. es liegen keine geforderte Reihenfolge oder Priorisierung vor.'' \cite{aufgabenstellung}
 \end{displayquote}
 %
-Bei Unternehmen, in denen 24/7 gearbeitet wird, muss der Auftragspool entweder nach einer gewissen Zeit abgearbeitet sein und dann neu gestartet werden, was mit Overhead und damit Ineffizienz verbunden ist. Oder die zu transportierenden Güter bekommen ein weiteres Deadline-Attribut, welches im Scheduling-Algorithmus mit einbezogen werden muss. Unternehmen, bei denen das nicht der Fall ist, könnten ihren Zeithorizont der Arbeitszeit anpassen. Das bedeutet, am Ende des Tages ist der Aufgabenpool abgearbeitet. Allerdings können das zwischendrin keine neuen Aufträge eingepflegt werden und man kann nicht erwarten, dass bestimmt Aufträge eher feritg werden als andere. Dafür müssten diese Unternehmen dann ebenfall den Auftragspool neu starten oder Prioritäten vergeben.
+Bei Unternehmen, in denen 24/7 gearbeitet wird, muss der Auftragspool entweder nach einer gewissen Zeit abgearbeitet sein und dann neu gestartet werden, was mit Overhead und damit Ineffizienz verbunden ist. Oder die zu transportierenden Güter bekommen ein weiteres Deadline-Attribut, welches im Scheduling-Algorithmus mit einbezogen werden muss. Unternehmen, bei denen das nicht der Fall ist, könnten ihren Zeithorizont der Arbeitszeit anpassen. Das bedeutet, am Ende des Tages ist der Aufgabenpool abgearbeitet. Allerdings können das zwischendrin keine neuen Aufträge eingepflegt werden und man kann nicht erwarten, dass bestimmt Aufträge eher fertig werden als andere. Dafür müssten diese Unternehmen dann ebenfalls den Auftragspool neu starten oder Prioritäten vergeben.
 
 \section{Treibstoff und Verschleiß}
 \begin{displayquote}
@@ -333,9 +443,9 @@ Natürlich ist in der Realität das Be- und Entladen mit einem gewissen Zeitaufw
     ``Die Fahrzeuge sind dimensionslos, d.h. Es finden keine Konflikte zwischen den Fahrzeugen statt, womit keine Ausweichmanöver von Nöten sind.'' \cite{aufgabenstellung}
 \end{displayquote}
 %
-Wie die bereitgestellten Videos der Simulation gezeigt haben, ist diese Annahme weit von der Realität entfernt. Es wurden dabei ausschließlich Beschleunigung und Dimension der Roboter einbezogen, was bereits zu einer 16\% - 65\% längeren Bearbeitungszeit führt. Bei der Kollisionsdetektions und des Ausweichmanövern gibt es evtl. noch etwas Verbesserungspotential. Des Weiteren könnte man einen Parameter hinzufügen, welcher die Anzahl an Kollisionen zählt und vom Algorithmus minimiert werden sollte. Jedoch führt eine minimal Kollisionszahl wahrscheinlich nicht immer zu besseren Zeiten, da die Roboter dann Umwege fahren müssten.
+Wie die bereitgestellten Videos der Simulation gezeigt haben, ist diese Annahme weit von der Realität entfernt. Es wurden dabei ausschließlich Beschleunigung und Dimension der Roboter einbezogen, was bereits zu einer \SIrange{16}{65}{\percent} längeren Bearbeitungszeit führt. Bei der Kollisionsdetektion und des Ausweichmanövern gibt es eventuell noch etwas Verbesserungspotential. Des Weiteren könnte man einen Parameter hinzufügen, welcher die Anzahl an Kollisionen zählt und vom Algorithmus minimiert werden sollte. Jedoch führt eine minimal Kollisionszahl wahrscheinlich nicht immer zu besseren Zeiten, da die Roboter dann Umwege fahren müssten.
 
-\section{Machinenkollisionen}
+\section{Maschinenkollisionen}
 \begin{displayquote}
     ``Die Maschinen sind dimensionslos, d.h. die Fahrzeuge fahren exakt zu den angegebenen Koordinaten der Maschinen, um ein Transportgut aufzunehmen oder abzugeben.'' \cite{aufgabenstellung}
 \end{displayquote}
