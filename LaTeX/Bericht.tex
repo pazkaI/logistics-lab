@@ -9,11 +9,12 @@
 \usepackage[german]{isodate}
 \usepackage{setspace}
 \usepackage{float}
-\usepackage{gensymb}
 \usepackage{amsmath}
 \usepackage{siunitx}
 \usepackage{csquotes}
 \usepackage[hidelinks]{hyperref}
+\usepackage{multirow,tabularx}
+\newcolumntype{Y}{>{\centering\arraybackslash}X}
 
 \newcommand{\code}[1]{\texttt{#1}}
 
@@ -36,31 +37,111 @@ Ferdinand Thiessen%
 \subtitle{Bericht Gruppe 6}
 \maketitle
 
+% 1.25 facher Zeilenabstand
 \setstretch{1.25}
 
+% Subsection ausblenden
 \setcounter{tocdepth}{1}
 \tableofcontents
 
 \chapter{Aufgabe 1}
-Aufgabenstellung: Erstellen Sie ein Konzept zur Berechnung eines gültigen sowie möglichst optimalen Einsatzplanes der Fahrzeuge.
+\section{Aufgabenstellung}
+Erstellen Sie ein Konzept zur Berechnung eines gültigen sowie möglichst optimalen Einsatzplanes der Fahrzeuge.
 
-\section{Ruin and recreate}
+\section{Ansatz 1: Kürzeste Strecke / Naiver Ansatz}
+\subsection{Strategie}
+Ein erster sehr simpler Ansatz zur Berechnung ist die Fahrtenplanung auf Basis
+der kürzesten Strecke zwischen zwei Stationen.
+Daher ein Fahrzeug wählt immer den Transportauftrag mit der kürzesten Strecke.
+Sollte an einem Zielort kein weiter Auftrag mehr vorhanden sein, wird die nächste
+Maschine mit offenen Aufträgen angesteuert.
+
+\subsection{Implementierung}
+Die Strategie wurde mittels JAVA umgesetzt, hierfür wurden keine externen
+Bibliotheken benötigt.
+
+Zuerst werden die Maschinen mit ihren Koordinaten angelegt und die Aufträge aus
+der enstprechenden Datei gelesen, danach wird jedem Fahrzeug der Auftrag mit der kürzesten Strecke, ausgehend von seiner Startposition zugewiesen.
+Nun werden die Aufträge mittels einer \emph{WHILE}-Schleife abgearbeitet,
+daher jede Iteration wird das Fahrzeug, welches am nächsten an seinem Ziel ist zu diesem
+bewegt und dort der nächste Auftrag ausgewählt, dafür wird die euklidische Distanz zwischen
+Ziel- und Startposition berechnet.
+
+
+\subsection{Ergebnisse}
+Die Implementation liefert das Ergebnis auf Grund des simplen Algorithmus ohn spürbare
+Verzögerung, die Lösungsgüte ist in Tabell \ref{table:shortest-paths} abgebildet:
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|}
+    \hline
+    Anzahl Fahrzeuge & Berechneter Wert \\ \hline
+    1                & \num{7888.60}    \\ \hline
+    3                & \num{2621.53}    \\ \hline
+    5                & \num{1633.48}    \\ \hline
+    \end{tabular}
+    \caption{Ergebnisse des Kürzeste-Stecken Ansatzes}
+    \label{table:shortest-paths}
+\end{table}
+
+
+\section{Ansatz 2: Greedy mit erweiterter Heuristik}
+Zwar handelt sich bei dem ersten Ansatz bereits um einen Greedy-Algorithmus,
+jedoch setzt dieser Ansatz auf einer verbesserte Heuristik mit weiteren
+Parametern neben der Distanz.
+
+\subsection{Strategie}
+
+\subsection{Implementierung}
+\subsection{Ergebnisse}
+Aufgrund des Greedy-Ansatzes liefert das Skript die Ergebnisse ohne spürbare Verzögerung,
+die Lösungsgüte ist in Tabelle \ref{table:greedy-paths} aufgezeigt.
+\begin{table}[H]
+    \centering
+    \begin{tabularx}{\textwidth}{|*{4}{Y|}}
+        \hline
+        \multirow{2}{*}{Anzahl Fahrzeuge} & \multicolumn{2}{c|}{Berechneter Wert}\\
+                                            \cline{2-3} &Version 1 &Version 2 \\
+        \hline
+        1    & \num{7757.18}   & \num{7165.10}    \\ \hline
+        3    & \num{2612.26}   & \num{2425.26}    \\ \hline
+        5    & \num{1577.01}   & \num{1462.75}    \\ \hline
+    \end{tabularx}
+    \caption{Ergebnisse des Greedy-Ansatzes}
+    \label{table:greedy-paths}
+\end{table}
+
+\section{Ansatz 3: Ruin and Recreate}
+\subsection{Strategie}
 Ein weiterer Ansatz zur Berechnung eines möglichst optimalen Ablaufplans ist die Verwendung der Ruin-and-Recreate Strategie beschrieben durch Schrimpf et al. \cite{schrimpf} Dieser Algorithmus verwendet einen iterativen Ansatz, in dem zuerst Teile der Lösung entfernt werden (Ruin-Schritt) und nachfolgend wieder anders zusammengesetzt (Recreate-Schritt) werden. Bei der erneuten Zusammensetzung der Lösung wird dabei ein Ergebnis präferiert, welches eine beschriebene Zielfunktion maximiert - in unserem Anwendungsfall also eine Lösung, die die zurückgelegte Strecke aller Fahrzeuge (und damit die Gesamtausführungszeit des Ablaufplans) minimiert.
 
-Zur Implementation dieser Meta-Heuristik verwenden wir das Java-Framework jSprit, welches auf dem Grundalgorithmus beschrieben durch Schrimpf et al. basiert. Dazu werden unsere bereitgestellten Fahrzeuge durch Objekte der Klasse \code{Vehicle} dargestellt. Diese werden mit einer Gesamtkapazität von 1 erstellt und initial an den korrespondierenden Maschinen positioniert. Die Transportanforderungen aus transport\_demand.txt werden in jSprit als Objekte der Klasse \code{Shipment} abgebildet. Jedes Shipment hat eine Größe von 1, es werden also gegebenenfalls mehrere Shipments mit der gleichen Start- und Zielposition erstellt, wenn die Transportanforderungen dies vorgeben. Zusätzlich werden dem Algorithmus noch benutzerdefinierte Constraints vorgegeben, die eine Senkung der maximalen Transportzeit im Recreate-Schritt des Algorithmus bevorzugt. Der Algorithmus wird dann mit einer Obergrenze von 2000 Iterationen gestartet und terminiert in ca. 100 Sekunden. Die Lösungsgüte ist in Tabelle \ref{table:ruin-and-recreate} abgebildet:
+\subsection{Implementierung}
+Zur Implementation dieser Meta-Heuristik verwenden wir das Java-Framework jSprit, welches auf dem Grundalgorithmus beschrieben durch Schrimpf et al. basiert. Dazu werden unsere bereitgestellten Fahrzeuge durch Objekte der Klasse \code{Vehicle} dargestellt. Diese werden mit einer Gesamtkapazität von 1 erstellt und initial an den korrespondierenden Maschinen positioniert. Die Transportanforderungen aus \emph{transport\_demand.txt} werden in jSprit als Objekte der Klasse \code{Shipment} abgebildet.
+
+Jedes Shipment hat eine Größe von 1, es werden also gegebenenfalls mehrere Shipments mit der gleichen Start- und Zielposition erstellt, wenn die Transportanforderungen dies vorgeben. Zusätzlich werden dem Algorithmus noch benutzerdefinierte Constraints vorgegeben, die eine Senkung der maximalen Transportzeit im Recreate-Schritt des Algorithmus bevorzugt. Der Algorithmus wird dann mit einer Obergrenze von \num{2000} Iterationen gestartet.
+
+\subsection{Ergebnisse}
+Die Laufzeit des Programms ist direkt abhängig von der Obergrenze der Iterationen,
+bei der gesetzten Obergrenze von \num{2000} Iterationen terminiert das Programm
+nach ca. 100 Sekunden.
+Die Lösungsgüte ist in Tabelle \ref{table:ruin-and-recreate} abgebildet:
 %
 \begin{table}[H]
     \centering
     \begin{tabular}{|c|c|}
     \hline
-    Anzahl Fahrzeuge & Berechneter Score \\ \hline
-    1                & 6,995.31          \\ \hline
-    3                & 2,324.02          \\ \hline
-    5                & 1,389.65          \\ \hline
+    Anzahl Fahrzeuge & Berechneter Wert \\ \hline
+    1                & \num{6995.31}    \\ \hline
+    3                & \num{2324.02}    \\ \hline
+    5                & \num{1389.65}    \\ \hline
     \end{tabular}
     \caption{Ergebnisse ruin-and-recreate}
     \label{table:ruin-and-recreate}
 \end{table}
+
+\section{Ergebnisdiskussion}
+%Die Ansätze 1 und 2 basieren beide auf einem
 
 \chapter{Aufgabe 2}
 \section{Initiale Probleme}
@@ -68,7 +149,7 @@ Bei der Umsetzung von Aufgabe 2 wurde zur Programmierung von der hauseigenen Leg
 
 Da das Programm die Rotation der Motoren allerdings in zu großen Abständen abtastet, wurde nie exakt die 2-Meter-Marke gemessen und somit überfahren. Aufgrund dessen wurde nach einer Alternative gesucht. Der Hinweis der Tutoren, die alte Softwareversion zu benutzen, kam leider zu spät.
 
-Das MicroPython Package, welches ebenfalls von Lego bereitgestellt wird, bot sich hierfür bestens an. Außerdem ermöglichte das eine einfachere Einarbeitung durch Python-Vorkenntnisse, verständlicheren Code und Kollaboration durch Verwendung von Git.
+Das \emph{MicroPython\,Package}, welches ebenfalls von Lego bereitgestellt wird, bot sich hierfür bestens an. Außerdem ermöglichte das eine einfachere Einarbeitung durch Python-Vorkenntnisse, verständlicheren Code und Kollaboration durch Verwendung von Git.
 
 
 \section{Experiment 1: Freie Fahrt}
@@ -83,14 +164,14 @@ Die Geschwindigkeit des Motors setzen wir initial auf $440$, da dies scheinbar d
     \begin{aligned}
        d &= \SI{56}{\mm}\\
        u &= \pi \cdot d \approx \SI{176}{\mm} \\
-       y &= \frac{\SI{2}{\m}}{u} \cdot 360\degree \approx 4092.6\degree
+       y &= \frac{\SI{2}{\m}}{u} \cdot \SI{360}{\degree} \approx \SI{4092.6}{\degree}
     \end{aligned}
  \end{equation}
  %
-Nach Gleichung \ref{equation:2meterstrecke} entsprechen 2 Meter also ca. $4092.6\degree$.
+Nach Gleichung \ref{equation:2meterstrecke} entsprechen 2 Meter also ca. \SI{4092.6}{\degree}.
 
 \subsection{Herausforderungen bei der Problemstellung}
-Leider mussten wir feststellen, dass der errechnete Werte stark von der Realität abweicht. Nach einem Testlauf haben wir den Wert manuell auf $y = 3870\degree$ eingestellt. Wir ließen den Roboter mehrmals die Strecke abfahren und ermittelten dabei die benötigte Zeit per Stoppuhr und die Abweichung von der erwarteten Zielposition. Letzteres unterteilten wir in zwei Messreihen: Abweichung in der Länge, also ob der Roboter zu kurz oder übers Ziel hinaus gefahren ist. Und Abweichung in der Breite, also ob der Roboter nach links oder rechts lenkt.
+Leider mussten wir feststellen, dass der errechnete Werte stark von der Realität abweicht. Nach einem Testlauf haben wir den Wert manuell auf $y = \SI{3870}{\degree}$ eingestellt. Wir ließen den Roboter mehrmals die Strecke abfahren und ermittelten dabei die benötigte Zeit per Stoppuhr und die Abweichung von der erwarteten Zielposition. Letzteres unterteilten wir in zwei Messreihen: Abweichung in der Länge, also ob der Roboter zu kurz oder übers Ziel hinaus gefahren ist. Und Abweichung in der Breite, also ob der Roboter nach links oder rechts lenkt.
 
 \subsection{Auswertung}
 Es gibt verschiedene Gründe für die Abweichung zwischen dem berechneten und gemessenen Gradmaß. Dazu zählen Messfehler sowohl beim Aufbau der Testumgebung als auch bei der Ermittlung des Raddurchmessers. Durch das Gewicht des Roboters kann außerdem der Reifen zusammengedrückt werden, was zu einer Veränderung des Raddurchmessers führt. Weiterhin erfolgt das Bremsen des Roboters nicht durch aktives Abbremsen, sondern durch Ausrollen der Motoren. Dadurch schaltet der Roboter bei Erreichen der gewünschten Radrotation $y$ zwar die Motoren ab, kommt jedoch erst ein paar Zentimeter später zum Stehen. Letztlich können auch Fehler bei der Startaufstellung des Roboters, wie bspw. Über- oder Unterschreiten der Startlinie und der initialen Stellung des Hinterrads auftreten.
