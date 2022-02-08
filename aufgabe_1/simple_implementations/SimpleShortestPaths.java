@@ -4,70 +4,113 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.ToDoubleFunction;
+import java.util.stream.Stream;
 
-/**
- * A simple algorithm for calculating a transport schedule.
- *
- * <p>
- * Decides the next location by looking at the closest machine where any current "outgoing" demand can be met first. If there is no more "outgoing" demand at the current machine,
- * go to the closest machine that still has some "outgoing" demand.
- */
 public class SimpleShortestPaths {
 
-    /**
-     * The list of machines.
-     */
+    static final int NUM_VEHICLES = 1;
+
     static final List<Machine> machines = new ArrayList<>();
 
-    /**
-     * A list to keep track of the current demands.
-     */
     static final List<Demand> demands = new ArrayList<>();
 
-    /**
-     * A list containing the calculated transports.
-     */
-    static final List<Transport> transports = new ArrayList<>();
+    static final List<Vehicle> vehicles = new ArrayList<>();
 
-    /**
-     * The main method.
-     */
+    static final List<ScheduleEntry> scheduleEntries = new ArrayList<>();
+
     public static void main(String[] args) {
-        createMachines();
-        importTransports();
+        parseMachines();
+        parseDemand();
+        initVehicles();
 
-        nextTransport(getById("1"), null, false);
+        greedy();
 
-        writeSchedule();
+        buildTransports();
+        export();
+    }
+
+    private static void export() {
+        var path = Paths.get("schedule.txt");
+        var lines = scheduleEntries.stream().map(ScheduleEntry::toString).toList();
+        try {
+            Files.write(path, lines);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        vehicles.stream().max(Comparator.comparing(Vehicle::getTravelDistance)).ifPresent(vehicle -> System.out.println(vehicle.getTravelDistance()));
+    }
+
+    private static void buildTransports() {
+        for (var vehicle : vehicles) {
+            var routes = vehicle.getRoutes();
+
+            for (int index = 0; index < routes.size(); index++) {
+                var route = routes.get(index);
+
+                if (index < routes.size() - 1) {
+                    var nextRoute = routes.get(index + 1);
+
+                    if (route.destination().equals(nextRoute.destination()) && route.unload() && nextRoute.load()) {
+                        var entry = new ScheduleEntry(vehicle.getIdForSchedule(), route.destination(), true, true);
+                        scheduleEntries.add(entry);
+
+                        index++;
+                        continue;
+                    }
+                }
+
+                var entry = new ScheduleEntry(vehicle.getIdForSchedule(), route.destination(), route.load(), route.unload());
+                scheduleEntries.add(entry);
+            }
+
+        }
+    }
+
+    private static void greedy() {
+        while (!demands.isEmpty()) {
+            // find vehicle with least distance traveled
+            var vehicle = vehicles.stream().min(Comparator.comparing(Vehicle::getTravelDistance)).orElseThrow();
+
+            // find demand which can be fulfilled with least cost
+            var demand = argmin(demands.stream(), d -> distanceNeededToFulfillDemand(vehicle, d));
+            if (demand == null) {
+                throw new IllegalStateException("meh");
+            }
+
+            // add route for demand to vehicle
+            vehicle.addRoute(new Route(demand.from(), true, false));
+            vehicle.addTravelDistance(vehicle.position().distance(demand.from().position()));
+            vehicle.setPosition(demand.from().position());
+
+            vehicle.addRoute(new Route(demand.to(), false, true));
+            vehicle.addTravelDistance(demand.from().distance(demand.to()));
+            vehicle.setPosition(demand.to().position());
+
+            demand.decreaseCount();
+            if (demand.count() == 0) {
+                demands.remove(demand);
+            }
+        }
     }
 
     /**
-     * Creates a number of machines at the given coordinates.
+     * Parses the machines from a file.
      */
-    private static void createMachines() {
-        machines.add(new Machine("1", 5, 5));
-        machines.add(new Machine("2", 50, 5));
-        machines.add(new Machine("3", 70, 25));
-        machines.add(new Machine("4", 60, 40));
-        machines.add(new Machine("5", 30, 40));
-        machines.add(new Machine("6", 5, 25));
-    }
-
-    /**
-     * Parses the transport demand from a file.
-     */
-    private static void importTransports() {
-        var path = Paths.get("transport_demand.txt");
+    private static void parseMachines() {
+        var path = Paths.get("machines.txt");
         try (var stream = Files.lines(path)) {
             stream.forEachOrdered(line -> {
-                if (!line.startsWith("start")) {
+                if (!line.startsWith("id")) {
                     var parts = line.split(";");
-                    var from = getById(parts[0]);
-                    var to = getById(parts[1]);
-                    var count = Integer.parseInt(parts[2]);
-                    demands.add(new Demand(from, to, count));
+                    var id = parts[0];
+                    var x = Integer.parseInt(parts[1]);
+                    var y = Integer.parseInt(parts[2]);
+                    machines.add(new Machine(id, new Position(x, y)));
                 }
             });
         } catch (IOException e) {
@@ -76,87 +119,35 @@ public class SimpleShortestPaths {
     }
 
     /**
-     * Calculates the next transport (which equals a single line in the schedule)
-     *
-     * @param current the current machine
-     * @param previous the previous machine
-     * @param isLoaded whether the transport from the previous to the current machine was loaded
+     * Parses the transport demand from a file.
      */
-    private static void nextTransport(Machine current, Machine previous, boolean isLoaded) {
-        if (isLoaded) {
-            // reduce count in demand list
-            var demand = getByOriginAndTarget(previous, current);
-            var index = demands.indexOf(demand);
-            demands.get(index).decreaseCount();
+    private static void parseDemand() {
+        var path = Paths.get("transport_demand.txt");
+        try (var stream = Files.lines(path)) {
+            stream.forEachOrdered(line -> {
+                if (!line.startsWith("start")) {
+                    var parts = line.split(";");
+                    var from = getMachineById(parts[0]);
+                    var to = getMachineById(parts[1]);
+                    var count = Integer.parseInt(parts[2]);
+                    demands.add(new Demand(from, to, count));
+                }
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
-        // check if there is demand from current to somewhere
-        var destinationsWithDemand = calculateDestinationsWithDemand(current);
-        if (!destinationsWithDemand.isEmpty()) {
-            // find closest machine that satisfies demand
-            var target = selectClosest(current, destinationsWithDemand);
+        // remove demand with 0 count
+        demands.removeIf(demand -> demand.count == 0);
+    }
 
-            // write transport
-            transports.add(new Transport("1", current, true, isLoaded));
+    private static void initVehicles() {
+        for (int i = 0; i < NUM_VEHICLES; i++) {
+            var initialPosition = machines.get(i).position();
+            var vehicle = new Vehicle(i, initialPosition);
 
-            // do next transport
-            nextTransport(target, current, true);
-        } else {
-            // find nodes that still have demand (excluding the current node)
-            var machinesWithDemand = calculateMachinesWithDemandExcluding(current);
-            if (!machinesWithDemand.isEmpty()) {
-                // find closest
-                var target = selectClosest(current, machinesWithDemand);
-
-                // write transport
-                transports.add(new Transport("1", current, false, isLoaded));
-
-                // do next transport
-                nextTransport(target, current, false);
-            } else {
-                // we are done, unload at last location
-                transports.add(new Transport("1", current, false, isLoaded));
-            }
+            vehicles.add(vehicle);
         }
-    }
-
-    /**
-     * Returns the machine from {@code destinations} that has the least distance from {@code origin}.
-     *
-     * @param origin the current machine
-     * @param destinations the list of possible destinations
-     * @return the closest machine from {@code destinations}
-     */
-    private static Machine selectClosest(Machine origin, List<Machine> destinations) {
-        return destinations.stream().reduce((a, b) -> origin.distance(a) >= origin.distance(b) ? a : b).get();
-    }
-
-    /**
-     * Returns a list of all machines (excluding the given machine) that have any "outgoing" demand.
-     *
-     * @param current the current machine
-     * @return a list of machines that have demand
-     */
-    private static List<Machine> calculateMachinesWithDemandExcluding(Machine current) {
-        return demands.stream()
-                .filter(demand -> demand.from() != current)
-                .filter(demand -> demand.count > 0)
-                .map(Demand::from)
-                .toList();
-    }
-
-    /**
-     * Returns all machines where an "incoming" demand exists from the given machine.
-     *
-     * @param current the given machine.
-     * @return a list of machines that have a demand from the given machine
-     */
-    private static List<Machine> calculateDestinationsWithDemand(Machine current) {
-        return demands.stream()
-                .filter(demand -> demand.from() == current)
-                .filter(demand -> demand.count() > 0)
-                .map(Demand::to)
-                .toList();
     }
 
     /**
@@ -165,43 +156,44 @@ public class SimpleShortestPaths {
      * @param id the machine id
      * @return the machine object
      */
-    private static Machine getById(String id) {
+    private static Machine getMachineById(String id) {
         return machines.stream().filter(m -> Objects.equals(m.id(), id)).findFirst().orElseThrow();
     }
 
     /**
-     * Returns the demand object with the given origin and target machines.
+     * Calculates the distance needed to fulfill the given demand with the given vehicle.
      *
-     * @param origin the machine at the origin
-     * @param target the machine at the target
-     * @return the demand object
+     * <p>
+     * It's the sum of the distance from the current vehicle position to the demand start and the distance of the demand start to demand end
+     *
+     * @param vehicle the vehicle
+     * @param demand the demand
+     * @return the needed distance
      */
-    private static Demand getByOriginAndTarget(Machine origin, Machine target) {
-        return demands.stream().filter(demand -> demand.from() == origin && demand.to() == target).findFirst().orElseThrow();
+    private static double distanceNeededToFulfillDemand(Vehicle vehicle, Demand demand) {
+        return vehicle.position().distance(demand.from().position()) + demand.from().distance(demand.to());
     }
 
-    /**
-     * Writes the calculated schedule to a file.
-     */
-    private static void writeSchedule() {
-        var path = Paths.get("schedule.txt");
-        var lines = transports.stream().map(Transport::toScheduleEntry).toList();
-        try {
-            Files.write(path, lines);
-        } catch (IOException e) {
-            e.printStackTrace();
+    private static <T> T argmin(Stream<T> stream, ToDoubleFunction<T> scorer) {
+        Double min = null;
+        T argmin = null;
+        for (T p: (Iterable<T>) stream::iterator) {
+            double score = scorer.applyAsDouble(p);
+            if (min==null || min > score) {
+                min = score;
+                argmin = p;
+            }
         }
+        return argmin;
     }
 
     /**
      * Record that represents a machine with an id and xy coordinates.
      */
-    record Machine(String id, int x, int y) {
+    record Machine(String id, Position position) {
 
         public double distance(Machine other) {
-            double distX = Math.abs(x - other.x);
-            double distY = Math.abs(y - other.y);
-            return Math.sqrt(distX*distX + distY*distY);
+            return this.position.distance(other.position);
         }
 
     }
@@ -240,9 +232,10 @@ public class SimpleShortestPaths {
     /**
      * Record representing a transport as needed in schedule.txt.
      */
-    record Transport(String vehicleId, Machine location, boolean load, boolean unload) {
+    record ScheduleEntry(String vehicleId, Machine location, boolean load, boolean unload) {
 
-        public String toScheduleEntry() {
+        @Override
+        public String toString() {
             var loadString = load ? "1": "0";
             var unloadString = unload ? "1" : "0";
 
@@ -250,4 +243,81 @@ public class SimpleShortestPaths {
         }
     }
 
+    static class Vehicle {
+        private final int id;
+        private Position position;
+        private double travelDistance = 0;
+
+        private final List<Route> routes = new ArrayList<>();
+
+        public Vehicle(int id, Position position) {
+            this.id = id;
+            this.position = position;
+        }
+
+        public int getId() {
+            return this.id;
+        }
+
+        public String getIdForSchedule() {
+            return String.valueOf(this.id + 1);
+        }
+
+        public double getTravelDistance() {
+            return this.travelDistance;
+        }
+
+        public void addRoute(Route route) {
+            this.routes.add(route);
+        }
+
+        public List<Route> getRoutes() {
+            return this.routes;
+        }
+
+        public void addTravelDistance(double distance) {
+            this.travelDistance += distance;
+        }
+
+        public void setPosition(Position position) {
+            this.position = position;
+        }
+
+        public Position position() {
+            return position;
+        }
+    }
+
+    record Route(Machine destination, boolean load, boolean unload) {
+
+    }
+
+    static class Position {
+        private int x;
+        private int y;
+
+        public Position(int x, int y) {
+            this.x = x;
+            this.y = y;
+        }
+
+        public void setPosition(int x, int y) {
+            this.x = x;
+            this.y = y;
+        }
+
+        public int x() {
+            return this.x;
+        }
+
+        public int y() {
+            return this.y;
+        }
+
+        public double distance(Position other) {
+            double distX = Math.abs(x - other.x);
+            double distY = Math.abs(y - other.y);
+            return Math.sqrt(distX*distX + distY*distY);
+        }
+    }
 }
