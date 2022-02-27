@@ -14,6 +14,7 @@
 \usepackage{csquotes}
 \usepackage[hidelinks]{hyperref}
 \usepackage{multirow,tabularx}
+\usepackage[center]{caption}
 \newcolumntype{Y}{>{\centering\arraybackslash}X}
 
 \newcommand{\code}[1]{\texttt{#1}}
@@ -46,13 +47,14 @@ Ferdinand Thiessen%
 
 \chapter{Aufgabe 1}
 \section{Aufgabenstellung}
-Erstellen Sie ein Konzept zur Berechnung eines gültigen sowie möglichst optimalen Einsatzplanes der Fahrzeuge.
+Erstellen Sie ein Konzept zur Berechnung eines gültigen sowie möglichst optimalen
+Einsatzplanes der Fahrzeuge.
 
 \section{Ansatz 1: Kürzeste Strecke / Naiver Ansatz}
 \subsection{Strategie}
 Ein erster sehr simpler Ansatz zur Berechnung ist die Fahrtenplanung auf Basis
 der kürzesten Strecke zwischen zwei Stationen.
-Daher ein Fahrzeug wählt immer den Transportauftrag mit der kürzesten Strecke.
+Dabei wählt ein Fahrzeug immer den Transportauftrag mit der kürzesten Strecke.
 Sollte an einem Zielort kein weiter Auftrag mehr vorhanden sein, wird die nächste
 Maschine mit offenen Aufträgen angesteuert.
 
@@ -61,18 +63,19 @@ Die Strategie wurde mittels JAVA umgesetzt, hierfür wurden keine externen
 Bibliotheken benötigt.
 
 Zuerst werden die Maschinen mit ihren Koordinaten angelegt und die Aufträge aus
-der entsprechenden Datei gelesen, danach wird jedem Fahrzeug der Auftrag mit der kürzesten Strecke, ausgehend von seiner Startposition zugewiesen.
-Nun werden die Aufträge mittels einer \emph{WHILE}-Schleife abgearbeitet,
-daher jede Iteration wird das Fahrzeug, welches am nächsten an seinem Ziel ist zu diesem
-bewegt und dort der nächste Auftrag ausgewählt, dafür wird die euklidische Distanz zwischen
-Ziel- und Startposition berechnet.
+der entsprechenden Datei gelesen, danach wird jedem Fahrzeug der Auftrag mit der
+kürzesten Strecke, ausgehend von seiner Startposition, zugewiesen.
+Nun werden die Aufträge mittels einer \emph{WHILE}-Schleife abgearbeitet.
+Dabei wird jede Iteration das Fahrzeug, welches sich am nächsten an seinem Ziel befindet
+zu diesem bewegt und dort der nächste Auftrag ausgewählt. Dafür wird die euklidische
+Distanz zwischen Ziel- und Startposition berechnet.
 
 
 \subsection{Ergebnisse}
 Die Implementation liefert das Ergebnis auf Grund des simplen Algorithmus ohne spürbare
 Verzögerung, gemessen wurde eine Ausführungszeit von $\approx \SI{0.818}{\second}$.
 
-Die Lösungsgüte ist in Tabelle \ref{table:shortest-paths} abgebildet.
+Die Lösungsgüte ist in Tabelle \ref{table:shortest-paths} abgebildet:
 
 \begin{table}[H]
     \centering
@@ -90,11 +93,13 @@ Die Lösungsgüte ist in Tabelle \ref{table:shortest-paths} abgebildet.
 
 \section{Ansatz 2: Greedy mit erweiterter Heuristik}
 Zwar handelt sich bei dem ersten Ansatz bereits um einen Greedy-Algorithmus,
-jedoch setzt dieser Ansatz auf einer verbesserte Heuristik mit weiteren
+jedoch setzt dieser Ansatz auf eine verbesserte Heuristik mit weiteren
 Parametern neben der Distanz.
 
 \subsection{Strategie}
-Im wesentlichen besteht dieser Ansatz aus zwei Schritten, der Bewegung und Ausführung eines Auftrags, sowie der Wahl eines neuen Auftrags, wie im Diagramm \ref{figure:greedy-diagram} zu sehen.
+Im wesentlichen besteht dieser Ansatz aus zwei Schritten, der Bewegung und Ausführung
+eines Auftrags, sowie der Wahl eines neuen Auftrags, wie im Diagramm
+\ref{figure:greedy-diagram} zu sehen.
 
 \begin{figure}[H]
     \centering
@@ -103,33 +108,33 @@ Im wesentlichen besteht dieser Ansatz aus zwei Schritten, der Bewegung und Ausf�
     \label{figure:greedy-diagram}
 \end{figure}
 
-Im ersten Schritt wird das Fahrtzeug mit der geringsten Distanz zu seinem Ziel gewählt (hat es kein Ziel ist die Distanz \num{0}) und alle Fahrzeuge um diese Distanz bewegt und
-geprüft ob ihre jeweiligen Aufträge nun erfüllt sind.
+Im ersten Schritt wird das Fahrtzeug mit der geringsten Distanz zu seinem Ziel gewählt
+(hat es kein Ziel ist die Distanz \num{0}) und alle Fahrzeuge um diese Distanz bewegt.
+Dann wird geprüft, ob ihre jeweiligen Aufträge nun erfüllt sind.
 
-Im nächsten Schritt wird für alle Fahrzeuge welche keinen aktiven Auftrag haben ein nächster
-Auftrag ausgewählt. Dieser Schritt unterscheidet sich von dem vorherigen Ansatz,
-da hier nun neben der Distanz zwischen Start- und Zielposition des Auftrags auch
-das Vorhandensein eines Anschlussauftrags als Parameter für die Heuristik herangezogen wird.
-Daher gibt es an der aktuellen Maschine Aufträge, wird der Auftrag ausgewählt, welcher
-an seinem Ziel einen Folgeauftrag hat.
-Sollte es keine Aufträge an der aktuellen Maschine geben, wird die nächste Maschine angesteuert,
-welche noch Aufträge hat.
+Im nächsten Schritt wird für alle Fahrzeuge, welche keinen aktiven Auftrag haben, ein
+nächster Auftrag ausgewählt. Dieser Schritt unterscheidet sich von dem vorherigen Ansatz,
+da hier nun neben der Distanz zwischen Start- und Zielposition des Auftrags auch das
+Vorhandensein eines Anschlussauftrags als Parameter für die Heuristik herangezogen wird.
+Dadurch wird an der aktuellen Maschine ein Auftrag ausgewählt, welcher an seinem Ziel
+einen Folgeauftrag hat. Sollte es keine Aufträge an der aktuellen Maschine geben, wird
+die nächste Maschine angesteuert, welche noch Aufträge hat.
 
 \subsubsection{Verbesserte Heuristik}
 Während der Implementation der Strategie hatte sich gezeigt, dass eine Optimierung der
-Heuristik möglich ist, hierfür wurde diese wie folge angepasst:
+Heuristik möglich ist. Hierfür wurde diese wie folge angepasst:
 
-Statt einfach nur danach zu sortieren ob ein Auftrag einen Folgeauftrag hat,
-wird ein Auftrag bewertet nach der Anzahl möglicher Folgeaufträge, daher ein Auftrag
-an dessen Ziel mehr Folgeaufträge warten hat eine höhere Priorität.
-Sollte es trotzdem noch mehrere Aufträge mit der selben Priorität geben, daher der selben Anzahl
-Folgeaufträge, werden diese noch einmal sortiert nach der Distanz des Auftrags,
-daher bei gleicher Anzahl Folgeaufträge wird der Auftrag mit der kürzesten Distanz zwischen
-Start- und Zielposition gewählt.
+Statt einfach nur danach zu sortieren, ob ein Auftrag einen Folgeauftrag hat, wird ein
+Auftrag nach der Anzahl möglicher Folgeaufträge bewertet. Ein Auftrag, an dessen Ziel
+mehr Folgeaufträge warten, hat eine höhere Priorität. Sollte es trotzdem noch mehrere
+Aufträge mit der selben Priorität geben, werden diese noch einmal nach der Distanz des
+Auftrags sortiert. Bei gleicher Anzahl Folgeaufträge wird der Auftrag mit der kürzesten
+Distanz zwischen Start- und Zielposition gewählt.
 
-Des weiteren im Fall, dass eine Maschine keine Aufträge mehr hat, wird nicht mehr die nächste
-Maschine angefahren, sondern die Maschine mit den meisten offenen Aufträgen. Sollte es hier mehrere mit der gleichen Anzahl geben wird hier die Maschine gewählt, zu der aktuell kein
-anderes Fahrzeug unterwegs ist.
+Im weiteren Fall, dass eine Maschine keine Aufträge mehr hat, wird nicht mehr die nächste
+Maschine angefahren, sondern die Maschine mit den meisten offenen Aufträgen. Sollte es
+hiervon Mehrere geben, wird die Maschine gewählt, zu der aktuell kein anderes Fahrzeug
+unterwegs ist.
 
 
 \subsection{Implementierung}
@@ -137,45 +142,50 @@ Der Ansatz wurde mittels \emph{Python} implementiert, die Umsetzung erfolgte gr�
 mit den mitgelieferten Paketen, einzig das \emph{numpy} Paket wurde zusätzlich verwendet
 um die Berechnung der Distanzen zu vereinfachen.
 
-Im ersten Schritt werden die Maschinen erzeugt, diese werden als einfach Tupel ihrer Koordinaten
-in einer Liste repräsentiert. Daher der Listenindex entspricht der \emph{ID} der Maschine.
-Des weiteren werden die Transportaufträge eingelesen und die Fahrzeuge erstellt, diese werden als Objekte mit den Attributen: ID, Position, Ziel, Distanz zum Ziel und ob sie Ladung transportieren repräsentiert.
+Im ersten Schritt werden die Maschinen erzeugt. Diese werden als einfache Tupel ihrer
+Koordinaten in einer Liste repräsentiert. Der Listenindex entspricht der \emph{ID} der
+Maschine. Des Weiteren werden die Transportaufträge eingelesen und die Fahrzeuge
+erstellt. Diese werden als Objekte mit folgenden Attributen repräsentiert: \emph{ID},
+\emph{Position}, \emph{Ziel}, \emph{Distanz zum Ziel} und, ob sie \emph{Ladung}
+transportieren.
 
-Danach werden, in einer \code{WHILE}-Schleife, die Aufträge abgearbeitet.
-Dies erfolgt, in dem das Fahrzeug mit der kürzesten Distanz zum Ziel ermittelt wird und
-alle Fahrzeuge um diese Distanz bewegt werden und alle aktiven Aufträge auf Erfüllung geprüft werden.
-Alle Fahrzeuge, welche nun keinen aktiven Auftrag mehr haben, werden nun mit einem neuen
-Auftrag versorgt, dazu werden die oberen Heuristiken verwendet.
+Danach werden in einer \code{WHILE}-Schleife die Aufträge abgearbeitet. Dies erfolgt,
+indem das Fahrzeug mit der kürzesten Distanz zum Ziel ermittelt wird, alle Fahrzeuge
+um diese Distanz bewegt werden und alle aktiven Aufträge auf Erfüllung geprüft werden.
+Alle Fahrzeuge, welche nun keinen aktiven Auftrag mehr haben, werden mit einem neuen
+Auftrag versorgt. Dazu werden die oberen Heuristiken verwendet.
 
-Dem Fahrzeug wird ein neues Ziel zugewiesen, sollte eine Fahrt mit Ladung erfolgen,
-wird dies im Fahrzeug gespeichert. Des weiteren wird für die spätere Ausgabe der Pfade,
-die Fahrt des Fahrzeugs in der Ausgabeliste hinzugefügt.
+Dem Fahrzeug wird ein neues Ziel zugewiesen. Sollte eine Fahrt mit Ladung erfolgen, wird
+dies im Fahrzeug gespeichert. Des Weiteren wird für die spätere Ausgabe der Pfade die
+Fahrt des Fahrzeugs der Ausgabeliste hinzugefügt.
 
 \subsubsection{Verbesserte Version}
 Um die verbesserte Heuristik zu Implementieren wurde die Implementierung der Fahrzeuge,
-Aufträge und Maschinen verändert.
-Für all diese Objekte wurden Klassen entworfen und Teile der Logik als Klassenmethoden
-implementiert, besonders die Implementierung der Fahrzeuge wurde angepasst, sodass jedes
-Fahrzeug nun eine Liste an aktuellen Aufträgen enthält, sowie eine Liste aller erledigter Aufträge.
+Aufträge und Maschinen verändert. Für all diese Objekte wurden Klassen entworfen und
+Teile der Logik als Klassenmethoden implementiert. Besonders die Implementierung der
+Fahrzeuge wurde angepasst, sodass jedes Fahrzeug nun eine Liste an aktuellen Aufträgen
+enthält, sowie eine Liste aller erledigter Aufträge.
 
-Ein wichtiger Unterschied zur vorhergehenden Version ist das Speichern eines Folgeauftrages
-im Falle eines Maschinenwechsels. Daher ein Fahrzeug, welches von einer Maschine, welche keine offenen Aufträge mehr hat, zu einer anderen Maschine unterwegs ist, blockt bereits den dortigen Folgeauftrag.
+Ein wichtiger Unterschied zur vorhergehenden Version ist das Speichern eines
+Folgeauftrages im Falle eines Maschinenwechsels. Ein Fahrzeug, welches von einer
+Maschine ohne offenen Aufträge zu einer anderen Maschine unterwegs ist, blockt bereits
+den dortigen Folgeauftrag.
 
-Somit wird der Fall umgangen, dass ein Fahrzeug zu einer Maschine fährt um dort einen Auftrag
-anzunehmen, jedoch ein anderes Fahrzeug schneller war und den Auftrag bereits angenommen hat.
-Dies würde sonst zu einer unnötigen Leerfahrt führen.
+Somit wird der Fall umgangen, dass ein Fahrzeug zu einer Maschine fährt um dort einen
+Auftrag anzunehmen, jedoch ein anderes Fahrzeug schneller war und den Auftrag bereits
+angenommen hat. Dies würde sonst zu einer unnötigen Leerfahrt führen.
 
-Erfolgte Fahrten werden nun direkt im Fahrzeug gespeichert, somit werden am Ende für die Ausgabe
-die Fahrzeuge durch iteriert und die Liste ihrer Pfade direkt aus der jeweiligen Fahrzeug liste
-extrahiert.
+Erfolgte Fahrten werden nun direkt im Fahrzeug gespeichert. Somit wird am Ende für die
+Ausgabe über die Fahrzeuge iteriert und die Liste ihrer Pfade direkt aus der jeweiligen
+Fahrzeugliste extrahiert.
 
 
 \subsection{Ergebnisse}
-Aufgrund des Greedy-Ansatzes liefert das Skript die Ergebnisse ohne spürbare Verzögerung,
-gemessen wurde eine Ausführungszeit von $\approx \SI{0.205}{\second}$
+Aufgrund des Greedy-Ansatzes liefert das Skript die Ergebnisse ohne spürbare Verzögerung.
+Gemessen wurde eine Ausführungszeit von $\approx \SI{0.205}{\second}$
 für die erste Version, respektive $\approx \SI{0.251}{\second}$ für die Verbesserte.
 
-Die Lösungsgüte ist in Tabelle \ref{table:greedy-paths} aufgezeigt.
+Die Lösungsgüte ist in Tabelle \ref{table:greedy-paths} abgebildet:
 \begin{table}[H]
     \centering
     \begin{tabularx}{\textwidth}{|*{4}{Y|}}
@@ -193,17 +203,36 @@ Die Lösungsgüte ist in Tabelle \ref{table:greedy-paths} aufgezeigt.
 
 \section{Ansatz 3: Ruin and Recreate}
 \subsection{Strategie}
-Ein weiterer Ansatz zur Berechnung eines möglichst optimalen Ablaufplans ist die Verwendung der \emph{Ruin-and-Recreate}-Strategie beschrieben durch Schrimpf et al. \cite{schrimpf} Dieser Algorithmus verwendet einen iterativen Ansatz, in dem zuerst Teile der Lösung entfernt werden (Ruin-Schritt) und nachfolgend wieder anders zusammengesetzt (Recreate-Schritt) werden. Bei der erneuten Zusammensetzung der Lösung wird dabei ein Ergebnis präferiert, welches eine beschriebene Zielfunktion maximiert - in unserem Anwendungsfall also eine Lösung, die die zurückgelegte Strecke aller Fahrzeuge (und damit die Gesamtausführungszeit des Ablaufplans) minimiert.
+Ein weiterer Ansatz zur Berechnung eines möglichst optimalen Ablaufplans ist die
+Verwendung der \emph{Ruin-and-Recreate}-Strategie beschrieben durch Schrimpf et al.
+\cite{schrimpf} Dieser Algorithmus verwendet einen iterativen Ansatz, in dem zuerst Teile
+der Lösung entfernt (Ruin-Schritt) und nachfolgend wieder anders zusammengesetzt
+(Recreate-Schritt) werden. Bei der erneuten Zusammensetzung der Lösung wird dabei ein
+Ergebnis präferiert, welches eine beschriebene Zielfunktion maximiert - in unserem
+Anwendungsfall also eine Lösung, die die zurückgelegte Strecke aller Fahrzeuge (und damit
+die Gesamtausführungszeit des Ablaufplans) minimiert.
 
 \subsection{Implementierung}
-Zur Implementation dieser Meta-Heuristik verwenden wir das Java-Framework jSprit, welches auf dem Grundalgorithmus beschrieben durch Schrimpf et al. basiert. Dazu werden unsere bereitgestellten Fahrzeuge durch Objekte der Klasse \code{Vehicle} dargestellt. Diese werden mit einer Gesamtkapazität von 1 erstellt und initial an den korrespondierenden Maschinen positioniert. Die Transportanforderungen aus \emph{transport\_demand.txt} werden in jSprit als Objekte der Klasse \code{Shipment} abgebildet.
+Zur Implementation dieser Meta-Heuristik verwenden wir das Java-Framework jSprit, welches
+auf dem von Schrimpf et al beschriebenen Grundalgorithmus basiert. Dazu werden unsere
+bereitgestellten Fahrzeuge durch Objekte der Klasse \code{Vehicle} dargestellt. Diese
+werden mit einer Gesamtkapazität von \num{1} erstellt und initial an den
+korrespondierenden Maschinen positioniert. Die Transportanforderungen aus
+\emph{transport\_demand.txt} werden in jSprit als Objekte der Klasse \code{Shipment}
+abgebildet.
 
-Jedes \code{Shipment} hat eine Größe von \emph{1}, es werden also gegebenenfalls mehrere Shipments mit der gleichen Start- und Zielposition erstellt, wenn die Transportanforderungen dies vorgeben. Zusätzlich werden dem Algorithmus noch benutzerdefinierte Constraints vorgegeben, die eine Senkung der maximalen Transportzeit im Recreate-Schritt des Algorithmus bevorzugt. Der Algorithmus wird dann mit einer Obergrenze von \num{2000} Iterationen gestartet.
+Jedes \code{Shipment} hat eine Größe von \num{1}, es werden also gegebenenfalls mehrere
+Shipments mit der gleichen Start- und Zielposition erstellt, wenn die
+Transportanforderungen dies vorgeben. Zusätzlich werden dem Algorithmus noch
+benutzerdefinierte Constraints vorgegeben, die eine Senkung der maximalen Transportzeit
+im Recreate-Schritt des Algorithmus bevorzugen. Der Algorithmus wird dann mit einer
+Obergrenze von \num{2000} Iterationen gestartet.
 
 \subsection{Ergebnisse}
-Die Laufzeit des Programms ist direkt abhängig von der Obergrenze der Iterationen,
-bei der gesetzten Obergrenze von \num{2000} Iterationen terminiert das Programm
-nach $\approx \SI{133.099}{\second}$.
+Die Laufzeit des Programms ist direkt abhängig von der Obergrenze der Iterationen. Bei
+der gesetzten Obergrenze von \num{2000} Iterationen terminiert das Programm nach
+$\approx \SI{133.099}{\second}$.
+
 Die Lösungsgüte ist in Tabelle \ref{table:ruin-and-recreate} abgebildet:
 %
 \begin{table}[H]
@@ -220,23 +249,25 @@ Die Lösungsgüte ist in Tabelle \ref{table:ruin-and-recreate} abgebildet:
 \end{table}
 
 \section{Ergebnisdiskussion}
-Der erste und zweite Ansatz basieren jeweils auf einem Greedy-Ansatz, daher es wird bei jeder
-Station der zu diesem Moment beste Auftrag ausgewählt.
-Dies hat den Vorteil, dass beide Strategien theoretisch dynamisch sich an neue Aufträge anpassen
-können, somit könnten während der Fahrt neue Aufträge hinzugefügt oder entfernt werden.
-Dies birgt jedoch auch den Nachteil, dass diese Strategien keine optimale Lösung bieten.
+Der erste und zweite Ansatz basieren jeweils auf einem Greedy-Ansatz, daher wird bei
+jeder Station der in diesem Moment beste Auftrag ausgewählt. Dies hat den Vorteil, dass
+sich beide Strategien theoretisch dynamisch an neue Aufträge anpassen können. Somit
+könnten während der Fahrt neue Aufträge hinzugefügt oder entfernt werden. Dies birgt
+jedoch auch den Nachteil, dass diese Strategien keine optimale Lösung bieten.
 
 Im Vergleich dazu zeigt die dritte Strategie eine deutlich bessere Lösungsgüte,
-jedoch wieder mit dem Nachteil, das eine vorherige Berechnung stattfinden muss und eine
-Veränderung der Aufträge eine neue Berechnung zur Folge hätte.
+jedoch wiederum mit dem Nachteil, dass eine vorherige Berechnung stattfinden muss und eine
+Veränderung der Aufträge eine Neuberechnung zur Folge hätte.
 
-Somit hängt es vom Anwendungsfall ab, ob eine Berechnung im Voraus möglich ist oder
-ob ein Kompromiss bei der Lösungsgüte möglich ist.
-Vergleicht man die Ergebnisse so erkannt man in der Gegenüberstellung \ref{table:compare-strategies},
-dass der erste Greedy-Ansatz kaum eine Verbesserung gegenüber dem Kürzeste-Distanz Ansatz bringt.
+Somit hängt es vom Anwendungsfall ab, ob eine Berechnung im Voraus ausreichend ist oder
+ob ein Kompromiss bei der Lösungsgüte eingegangen werden möchte.
+Vergleicht man die Ergebnisse, so erkennt man in der Gegenüberstellung
+\ref{table:compare-strategies}, dass der erste Greedy-Ansatz kaum eine Verbesserung
+gegenüber dem Kürzeste-Distanz Ansatz bringt.
 Jedoch die verbesserte Version beiden deutlich überlegen ist.
-Der \emph{Ruin-and-Recreate}-Ansatz ist noch um $\approx \SI{3.85}{\percent}$ besser als der
-zweite Greedy-Ansatz, jedoch auf Kosten einer um $\approx \SI{530}{\percent}$ höheren Laufzeit.
+Der \emph{Ruin-and-Recreate}-Ansatz ist noch um $\approx \SI{3.85}{\percent}$ besser als
+der zweite Greedy-Ansatz, jedoch auf Kosten einer um $\approx \SI{530}{\percent}$ höheren
+Laufzeit.
 
 \begin{table}[H]
     \centering
@@ -249,7 +280,8 @@ zweite Greedy-Ansatz, jedoch auf Kosten einer um $\approx \SI{530}{\percent}$ h�
     2.2       & \SI{ 9.04}{\percent}   & \SI{ 7.35}{\percent}     & 0                   \\ \hline
     3         & \SI{12.53}{\percent}   & \SI{10.91}{\percent}     & \SI{3.85}{\percent} \\ \hline
     \end{tabular}
-    \caption{Verbesserung der Ergebnisse, gemittelt aus den Verbesserungen der jeweiligen Ergebnissen (ein, drei und fünf Fahrzeuge).}
+    \caption{Verbesserung der Ergebnisse, gemittelt aus den Verbesserungen der jeweiligen
+    Ergebnissen (ein, drei und fünf Fahrzeuge).}
     \label{table:compare-strategies}
 \end{table}
 
