@@ -103,7 +103,7 @@ eines Auftrags, sowie der Wahl eines neuen Auftrags, wie im Diagramm
 
 \begin{figure}[H]
     \centering
-    \includegraphics[scale=0.5]{images/greedy-diagram}
+    \includegraphics[scale=0.5]{src/greedy-diagram}
     \caption{Ablauf Greedy Ansatz}
     \label{figure:greedy-diagram}
 \end{figure}
@@ -287,20 +287,34 @@ Laufzeit.
 
 \chapter{Aufgabe 2}
 \section{Initiale Probleme}
-Bei der Umsetzung von Aufgabe 2 wurde zur Programmierung von der hauseigenen Lego Software abgesehen. Leider wollte uns die Benutzung des \code{repeat until}-Blockes, welcher eine while-Schleife abbilden soll, nicht gelingen. Sowohl die Bedingung $x < y$ als auch $x > y$ führten nicht zum gewünschten Verhalten. Nur bei $x = y$ zeigte der Roboter eine Reaktion.
+Bei der Umsetzung von Aufgabe 2 wurde zur Programmierung von der hauseigenen Lego Software
+abgesehen. Leider wollte uns die Benutzung des \code{repeat until}-Blockes, welcher eine
+\code{while}-Schleife abbilden soll, nicht gelingen. Sowohl die Bedingung $x < y$ als auch
+$x > y$ führten nicht zum gewünschten Verhalten. Nur bei $x = y$ zeigte der Roboter eine
+Reaktion.
 
-Da das Programm die Rotation der Motoren allerdings in zu großen Abständen abtastet, wurde nie exakt die 2-Meter-Marke gemessen und somit überfahren. Aufgrund dessen wurde nach einer Alternative gesucht. Der Hinweis der Tutoren, die alte Softwareversion zu benutzen, kam leider zu spät.
+Da das Programm die Rotation der Motoren allerdings in zu großen Abständen abtastet,
+wurde nie exakt die 2-Meter-Marke gemessen und somit überfahren. Aufgrund dessen wurde
+nach einer Alternative gesucht. Der Hinweis der Tutoren, die alte Softwareversion zu
+benutzen, erreichte uns leider zu spät.
 
-Das \emph{MicroPython\,Package}, welches ebenfalls von Lego bereitgestellt wird, bot sich hierfür bestens an. Außerdem ermöglichte das eine einfachere Einarbeitung durch Python-Vorkenntnisse, verständlicheren Code und Kollaboration durch Verwendung von Git.
+Das \emph{MicroPython\,Package}, welches ebenfalls von Lego bereitgestellt wird, bot
+sich hierfür bestens an. Außerdem ermöglichte es eine einfachere Einarbeitung durch
+Python-Vorkenntnisse, verständlicheren Code und Kollaboration durch Verwendung von Git.
 
 
 \section{Experiment 1: Freie Fahrt}
 \subsection{Aufgabenstellung}
-Das Fahrzeug soll ohne weitere Sensorik eine Strecke von $\SI{2}{\m}$ geradeaus zurücklegen.
+Das Fahrzeug soll ohne weitere Sensorik eine Strecke von $\SI{2}{\m}$ geradeaus
+zurücklegen.
 
 \subsection{Herangehensweise}
-Die Geschwindigkeit des Motors setzen wir initial auf $440$, da dies scheinbar die Maximalgeschwindigkeit ist. Um die zurückgelegte Strecke des Roboters zu ermitteln, muss die Rotation des Motors gemessen werden. Mit Hilfe der Funktion \code{motor.angle()} wird die Motorstellung in Grad ausgelesen und kann mit Hilfe des Radumfangs $d$ in eine Strecke umgerechnet werden.
-%
+Die Geschwindigkeit des Motors setzen wir initial auf $\SI{440}{\frac{\mm}{\s}}$, da dies
+scheinbar die Maximalgeschwindigkeit ist. Um die zurückgelegte Strecke des Roboters zu
+ermitteln, muss die Rotation des Motors gemessen werden. Mit Hilfe der Funktion
+\code{motor.angle()} wird die Motorstellung in Grad ausgelesen und kann mit Hilfe des
+Radumfangs $d$ in eine Strecke umgerechnet werden.
+
 \begin{equation}
     \label{equation:2meterstrecke}
     \begin{aligned}
@@ -308,32 +322,67 @@ Die Geschwindigkeit des Motors setzen wir initial auf $440$, da dies scheinbar d
        u &= \pi \cdot d \approx \SI{176}{\mm} \\
        y &= \frac{\SI{2}{\m}}{u} \cdot \SI{360}{\degree} \approx \SI{4092.6}{\degree}
     \end{aligned}
- \end{equation}
- %
-Nach Gleichung \ref{equation:2meterstrecke} entsprechen 2 Meter also ca. \SI{4092.6}{\degree}.
+\end{equation}
+
+Nach Gleichung \ref{equation:2meterstrecke} entsprechen 2 Meter also ca.
+\SI{4092.6}{\degree}.
 
 \subsection{Herausforderungen bei der Problemstellung}
-Leider mussten wir feststellen, dass der errechnete Werte stark von der Realität abweicht. Nach einem Testlauf haben wir den Wert manuell auf $y = \SI{3870}{\degree}$ eingestellt. Wir ließen den Roboter mehrmals die Strecke abfahren und ermittelten dabei die benötigte Zeit per Stoppuhr und die Abweichung von der erwarteten Zielposition. Letzteres unterteilten wir in zwei Messreihen: Abweichung in der Länge, also ob der Roboter zu kurz oder übers Ziel hinaus gefahren ist. Und Abweichung in der Breite, also ob der Roboter nach links oder rechts lenkt.
+Leider mussten wir feststellen, dass der errechnete Werte stark von der Realität abweicht.
+Nach einigen Testläufen haben wir den Wert manuell auf $y = \SI{3870}{\degree}$ eingestellt.
+Wir ließen den Roboter mehrmals die Strecke abfahren und ermittelten dabei die benötigte
+Zeit. Diese misst der Roboter selbst und gibt sie auf dem Display aus, um mögliche
+Messfehler unsereseits zu vermeiden. Außerdem maßen wir die Abweichung von der
+erwarteten Zielposition. Dies unterteilten wir in zwei Messreihen: Abweichung in der
+Länge, also ob der Roboter zu kurz oder übers Ziel hinaus gefahren ist. Und Abweichung in
+der Breite, also ob der Roboter nach links oder rechts lenkt.
 
 \subsection{Auswertung}
-Es gibt verschiedene Gründe für die Abweichung zwischen dem berechneten und gemessenen Gradmaß. Dazu zählen Messfehler sowohl beim Aufbau der Testumgebung als auch bei der Ermittlung des Raddurchmessers. Durch das Gewicht des Roboters kann außerdem der Reifen zusammengedrückt werden, was zu einer Veränderung des Raddurchmessers führt. Weiterhin erfolgt das Bremsen des Roboters nicht durch aktives Abbremsen, sondern durch Ausrollen der Motoren. Dadurch schaltet der Roboter bei Erreichen der gewünschten Radrotation $y$ zwar die Motoren ab, kommt jedoch erst ein paar Zentimeter später zum Stehen. Letztlich können auch Fehler bei der Startaufstellung des Roboters, wie beispielsweise Über- oder Unterschreiten der Startlinie und der initialen Stellung des Hinterrads auftreten.
+\subsubsection{Abweichung vom Gradmaß}
+Es gibt verschiedene Gründe für die Abweichung zwischen dem berechnetem und gemessenem
+Gradmaß. Dazu zählen Messfehler sowohl beim Aufbau der Testumgebung als auch bei der
+Ermittlung des Raddurchmessers. Durch das Gewicht des Roboters kann außerdem der Reifen
+zusammengedrückt werden, was zu einer Veränderung des Raddurchmessers führt. Weiterhin
+erfolgt das Bremsen des Roboters nicht durch aktives Abbremsen, sondern durch Ausrollen
+der Motoren. Dadurch schaltet der Roboter beim Erreichen der gewünschten Radrotation
+$y$ zwar die Motoren ab, kommt jedoch erst ein paar Zentimeter später zum Stehen.
+Letztlich können auch Fehler bei der Startaufstellung des Roboters, wie beispielsweise
+Über- oder Unterschreiten der Startlinie und der initialen Stellung des Hinterrads
+auftreten.
 
-Tabelle \ref{table:zeitmessung} zeigt die Ergebnisse der Zeitmessung. Die Streuung der Messergebnisse ist sehr klein und ist wahrscheinlich stark von Messfehlern beeinträchtigt, sodass wir 10 Zeitmessungen als ausreichend empfanden und wir uns keine neuen Erkenntnisse von weiteren Messungen erhofften.
+\subsubsection{Zeitmessung}
+Tabelle \ref{table:zeitmessung} zeigt die Messergebnisse der Zeitmessung. Die Streuung ist
+sehr klein.
+Abbildung \ref{figure:zeitverteilung} zeigt in einem Histogramm die Verteilung der
+Daten im Vergleich zu einer Normalverteilung. Mit grafischer Analyse könnte man eine
+leichte Annäherung an die Verteilung festellen.
 %
 \begin{table}[H]
     \centering
     \begin{tabular}{|c|c|}
     \hline
-    Mean               & $\SI{5,65}{\s}$ \\ \hline
-    Standardabweichung & $\SI{0,09}{\s}$ \\ \hline
-    Min                & $\SI{5,47}{\s}$ \\ \hline
-    Max                & $\SI{5,78}{\s}$ \\ \hline
+    Mean               & $\SI{5,335}{\s}$ \\ \hline
+    Standardabweichung & $\SI{0,013}{\s}$ \\ \hline
+    Min                & $\SI{5,31}{\s}$ \\ \hline
+    Max                & $\SI{5,36}{\s}$ \\ \hline
     \end{tabular}
     \caption{Zeitmessung}
     \label{table:zeitmessung}
 \end{table}
 %
-Tabelle \ref{table:laengenabweichung} stellt die Abweichung von der erwarteten Zielposition in der Länge dar. Ein optimales Ergebnis wird hier mit $\SI{0}{\mm}$ repräsentiert, während negative Werte für zu kurze Fahrten und positive Werte für zu lange Fahrten stehen. Den stärksten Fehlereinfluss auf die Streuung hier hat wahrscheinlich die Variation der initiale Startposition des Roboters.
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.5]{src/charts/zeitverteilung.png}
+    \caption{Zeitverteilung}
+    \label{figure:zeitverteilung}
+\end{figure}
+%
+\subsubsection{Längenabweichung}
+Tabelle \ref{table:laengenabweichung} stellt die Abweichung von der erwarteten
+Zielposition in der Länge dar. Ein optimales Ergebnis wird hier mit $\SI{0}{\mm}$
+repräsentiert, während negative Werte für zu kurze Fahrten und positive Werte für zu
+lange Fahrten stehen. Den stärksten Fehlereinfluss auf die Streuung hier hat
+wahrscheinlich die Variation der initiale Startposition des Roboters.
 %
 \begin{table}[H]
     \centering
@@ -348,16 +397,24 @@ Tabelle \ref{table:laengenabweichung} stellt die Abweichung von der erwarteten Z
     \label{table:laengenabweichung}
 \end{table}
 %
-Die Verteilung der Daten, wie im Histogramm in Abbildung \ref{figure:laengenverteilung} zu sehen, lässt auf eine annähernde Normalverteilung der Messwerte schließen. Diese Erkenntnis kann genutzt werden, um den Roboter erneut zu kalibrieren. Diese kleine Abweichung konnte bei der initialen Kalibrierung nur schwer bemerkt werden, summiert sich allerdings bei hoher Anzahl an Fahrten auf uns sorgt für Probleme und Ineffizienzen.
+Die Verteilung der Daten, wie im Histogramm in Abbildung \ref{figure:laengenverteilung}
+zu sehen, lässt auf eine annähernde Normalverteilung der Messwerte schließen. Diese
+Erkenntnis kann genutzt werden, um den Roboter erneut zu kalibrieren. Solch eine kleine
+Abweichung konnte bei der initialen Kalibrierung nur schwer bemerkt werden, summiert sich
+allerdings bei hoher Anzahl an Fahrten auf uns sorgt für Probleme und Ineffizienzen.
 %
 \begin{figure}[H]
     \centering
-    \includegraphics[scale=0.5]{images/laengenverteilung.png}
+    \includegraphics[scale=0.5]{src/charts/laengenverteilung.png}
     \caption{Längenverteilung}
     \label{figure:laengenverteilung}
 \end{figure}
 %
-Tabelle \ref{table:breitenabweichung} stellt die Abweichung von der erwarteten Zielposition in der Breite dar. Ein optimales Ergebnis wird wieder mit $\SI{0}{\mm}$ repräsentiert, während negative Werte für eine Linkslenkung und positive Werte für eine Rechtslenkung stehen.
+\subsubsection{Breitenabweichung}
+Tabelle \ref{table:breitenabweichung} stellt die Abweichung von der erwarteten
+Zielposition in der Breite dar. Ein optimales Ergebnis wird wieder mit $\SI{0}{\mm}$
+repräsentiert, während negative Werte für eine Linkslenkung und positive Werte für eine
+Rechtslenkung stehen.
 %
 \begin{table}[H]
     \centering
@@ -372,38 +429,113 @@ Tabelle \ref{table:breitenabweichung} stellt die Abweichung von der erwarteten Z
     \label{table:breitenabweichung}
 \end{table}
 %
-Es liegen höchstwahrscheinlich die selben Gründe für Abweichung vor. Allerdings ist eine stärkere Streuung zu erkennen. Begründet werden kann dies mit dem Verhältnis von Längen- und Breitenabweichung. Mathematisch gesehen führt eine Abweichung von $\SI{100}{\mm}$ zu einer Fahrtstrecke von $\SI{2002,5}{\mm}$, bevor der Roboter die Ziellinie überquert. Dabei wird eine gerade Strecke angenommen. Sollte einer der Motoren weniger Leistung als der andere liefern, führt das zu einer Kurvenfahrt. Dies könnte man überprüfen, indem man Messwerte auf halber Strecke oder noch öfter ermittelt. Da der Roboter per Programmierung nur 2 Meter zurückgelegt, führt das zu einer Längenabweichung von $\SI{2,5}{\mm}$. Der Verhältnis von Längen- zu Breitenabweichung beträgt also $1:40$.
-
-Auch im Histogramm in Abbildung \ref{figure:breitenverteilung} lässt sich eine Normalverteilung der Messwerte erkennen. Wie auch bei der Längenabweichung kann diese Erkenntnis zur nachträglichen Kalibrierung genutzt werden. Da man aber annehmen kann, dass sich die Startposition über viele Versuche hinweg mittelt, wird klar, dass der Roboter womöglich einen leichten Linksdrall hat. Auch das kann bei der Kalibrierung berücksichtigt werden. Möglicherweise liegt aber auch ein technischer Defekt oder Verschleiß vor. Des Weiteren besteht trotz Kalibrierung eine große Streuung. Dies kann ausschließlich gelöst werden, indem der Roboter sich per Sensorik an der Linie orientiert. 
+Auch im Histogramm in Abbildung \ref{figure:breitenverteilung} lässt sich eine
+Normalverteilung der Messwerte erkennen. Wie auch bei der Längenabweichung kann diese
+Erkenntnis zur nachträglichen Kalibrierung genutzt werden. 
 %
 \begin{figure}[H]
     \centering
-    \includegraphics[scale=0.5]{images/breitenverteilung.png}
+    \includegraphics[scale=0.5]{src/charts/breitenverteilung.png}
     \caption{Längenverteilung}
     \label{figure:breitenverteilung}
 \end{figure}
+Es liegen höchstwahrscheinlich die selben Gründe für Abweichung vor. Allerdings ist eine
+stärkere Streuung zu erkennen. 
 
+\subsubsection{Zusammenhang Längen- und Breitenabweichung}
+Begründet werden kann diese Streuung mit dem Verhältnis von Längen- und Breitenabweichung. 
+Mathematisch gesehen führt eine Abweichung von $\SI{100}{\mm}$ zu einer Fahrtstrecke von
+$\SI{2002,5}{\mm}$, bevor der Roboter die Ziellinie überquert. Dabei wird eine gerade
+Strecke angenommen. Da der Roboter per Programmierung nur 2 Meter zurückgelegt, führt das
+zu einer Längenabweichung von $\SI{2,5}{\mm}$. Das Verhältnis von Längen- zu
+Breitenabweichung würde also $1:40$ betragen. Sollte einer der Motoren weniger Leistung
+als der andere liefern, führt das zu einer Kurvenfahrt. Dies könnte man überprüfen, indem
+man Messwerte auf halber Strecke, oder noch öfter, ermittelt oder indem man das
+mathematische Verhätnis mit dem Verhätnis der beiden Mittelwerte der Messreihen
+vergleicht. Dieses beträgt circa $1:3,6$. Der Roboter legt also mehr Strecke zurück, also
+er rechnerisch fahren müsste. Womöglich ist das eine Anzeichen für eine Kurvenfahrt und
+damit ungleich starke Motoren, allerdings spielen wahrscheinlich auch hier Messfehler und
+ein ungenauer Versuchsaufbau eine signifikante Rolle. Abbildung 
+\ref{figure:verhaeltnis_laenge_breite} zeigt das Verhältnis der Messergebnisse von Länge
+und Breite.
+%
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.5]{src/charts/verhaeltnis_laenge_breite.png}
+    \caption{Verhältnis Länge und Breite}
+    \label{figure:verhaeltnis_laenge_breite}
+\end{figure}
+%
+
+\subsubsection{Zusammenhang örtliche und zeitliche Abweichung}
+Da man aber annehmen kann, dass sich die Startposition über viele Versuche hinweg mittelt,
+wird klar, dass der Roboter womöglich einen leichten Linksdrall hat. Auch das kann bei der
+Kalibrierung berücksichtigt werden. Möglicherweise liegt aber auch ein technischer Defekt oder
+Verschleiß vor. Des Weiteren besteht trotz Kalibrierung eine große Streuung. Diese kann
+theoretisch nur zwei Gründe haben. Entweder haben die Motoren zwischen den
+Messdurchläufen Leistungsschwankungen oder der Roboter fährt eine relativ konstante,
+wenn u.U. auch gebogene, Linie und die Startposition und/oder das Anfahren sorgen für die
+gemessene Streuung. Sollte Ersteres der Fall sein, müssten wir eine Korrelation zwischen
+Breitenabweichung und Zeit festellen, da wir das Erreichen des Ziels an der Umdrehung des
+linken Rades fest machen. Ein Durchlauf mit niedriger Performance dieses Rades hätte eine
+längere Fahrtzeit zur Folge. Wie Abbildung \ref{figure:verhaeltnis_zeit_breite} allerdings
+zeigt, lässt sich solch eine Korrelation, zumindest über die 60 Versuchsdurchläufe
+hinweg, nicht feststellen. Also geht die Streuung vermutlich wieder aus den bekannten
+Messungs- und Aufbauungenauigkeiten hervor. Diesen kann ausschließlich entgegen gewirkt
+werden, indem der Roboter sich per Sensorik an der Linie orientiert (siehe: Experiment 2). 
+%
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.5]{src/charts/verhaeltnis_breite_zeit.png}
+    \caption{Verhältnis Zeit- und Breitenabweichung}
+    \label{figure:verhaeltnis_zeit_breite}
+\end{figure}
+%
 \section{Experiment 2: Folgen einer Spur}
 \subsection{Aufgabenstellung}
-Das Fahrzeug soll mit seiner Sensorik eine Strecke von $\SI{2}{\m}$ geradeaus zurücklegen.
+Das Fahrzeug soll mit seiner Sensorik eine Strecke von $\SI{2}{\m}$ geradeaus
+zurücklegen.
 
 \subsection{Herangehensweise}
-Für diese Aufgabe muss der Farbsensor des Roboters einbezogen werden. Um die Messwerte des Sensors in die Programmierung des Roboters mit einzubeziehen, wurde ein Proportional-Controller genutzt. Ein PID-Controller würde vermutlich für kaum merkbare Verbesserung sorgen, steigert die Komplexität allerdings extrem. Damit der Farbsensor möglichst aussagekräftige und unterscheidbare Werte liefert, nutzen wir weißes Tape auf einem schwarzen Tisch, was für starke Kontraste sorgt.
+Für diese Aufgabe muss der Farbsensor des Roboters einbezogen werden. Um die Messwerte
+des Sensors in die Programmierung des Roboters mit einzubeziehen, wurde ein
+Proportional-Controller genutzt. Ein PID-Controller würde vermutlich für kaum merkbare
+Verbesserung sorgen, steigert die Komplexität allerdings extrem. Damit der Farbsensor
+möglichst aussagekräftige und unterscheidbare Werte liefert, nutzen wir weißes Tape auf
+einem schwarzen Tisch, was für starke Kontraste sorgt.
+
+\includegraphics[scale=0.5]{src/images/robot_front.jpg}
 
 \subsection{Herausforderungen bei der Problemlösung}
-Die größte Schwierigkeit bei dieser Aufgabe besteht in der Kalibrierung des P-Controllers. Allerdings lässt sich bei nur einer Regelgröße relativ schnell ein geeigneter Parameter finden. Ein weiteres Problem stellt der Lichteinfall dar. Durch Sonneneinstrahlung oder Lampenreflektion könnten die Sensormesswerte verfälscht werden. Am besten lässt sich das Experiment vermutlich im Dunkeln durchführen, da der Sensor sein eigenes Licht mitbringt. Bereits genannte Gründe für Abweichung kommen auch hier wieder zum tragen, wobei der Roboter Ungenauigkeiten in der Startposition relativ schnell kompensieren kann.
+Die größte Schwierigkeit bei dieser Aufgabe besteht in der Kalibrierung des P-Controllers.
+Allerdings lässt sich bei nur einer Regelgröße relativ schnell ein geeigneter Parameter
+finden. Ein weiteres Problem stellt der Lichteinfall dar. Durch Sonneneinstrahlung oder
+Lampenreflektion könnten die Sensormesswerte verfälscht werden. Am besten lässt sich das
+Experiment vermutlich im Dunkeln durchführen, da der Sensor sein eigenes Licht mitbringt.
+Bereits genannte Gründe für Abweichung kommen auch hier wieder zum tragen, wobei der
+Roboter Ungenauigkeiten in der Startposition relativ schnell kompensieren kann.
 
 \subsection{Auswertung}
-Tabelle \ref{table:zeitmessung2} zeigt die Ergebnisse der Zeitmessung. Auch hier ist die Streuung sehr klein und wahrscheinlich stark von Messfehlern abhängig. Jedoch lässt sich eine minimale Verbesserung zu den Werten des ersten Experiments feststellen. Dies würde sich mit einer geringeren Abweichung von der erwarteten Zielposition erklären lassen.
+Tabelle \ref{table:zeitmessung2} zeigt die Ergebnisse der Zeitmessung. Bereits nach 10
+Testdurchläuften stellen wir fest, dass die Abweichungen von der erwarteten Zielposition
+minimal und teilweise nicht messbar waren, weshlab wir uns von weiteren Durchläufen keine
+neuen Erkenntnisse erwarteten. Der Roboter profitiert also sehr stark von seinem
+Farbsensor und dem P-Regler. Eine leichte Verschlechterung der Zeitenmessung lässt sich 
+dennoch festellen. Das Minimum ist kleiner, da der Roboter in diesem Durchlauf vermutlich
+sehr gute Startbedingungen hatte und eine perfekte Linie fahren konnte. Dennoch sind
+Mittelweit, Streuung und Maximum größer. Hier spielen höchstwahrscheinlich die stetigen
+Nachbesserungen des Reglers eine große Rolle. Dennoch ist der Zeitverlust im Vergleich
+zum Präzisionsgewinn minimal und eine solche Roboterkonfiguration lohnt sich definitiv.
 %
 \begin{table}[H]
     \centering
-    \begin{tabular}{|c|c|}
+    \begin{tabular}{|c|c|c|}
     \hline
-    Mean               & $\SI{5,65}{\mm}$ \\ \hline
-    Standardabweichung & $\SI{0,08}{\mm}$ \\ \hline
-    Min                & $\SI{5,52}{\mm}$ \\ \hline
-    Max                & $\SI{5,78}{\mm}$ \\ \hline
+                       & Experiment 1      & Experiment 2      \\ \hline
+    Mean               & $\SI{5,335}{\mm}$ & $\SI{5,343}{\mm}$ \\ \hline
+    Standardabweichung & $\SI{0,013}{\mm}$ & $\SI{0,074}{\mm}$ \\ \hline
+    Min                & $\SI{5,31}{\mm}$  & $\SI{5,225}{\mm}$ \\ \hline
+    Max                & $\SI{5,36}{\mm}$  & $\SI{5,471}{\mm}$ \\ \hline
     \end{tabular}
     \caption{Zeitmessung}
     \label{table:zeitmessung2}
@@ -411,33 +543,58 @@ Tabelle \ref{table:zeitmessung2} zeigt die Ergebnisse der Zeitmessung. Auch hier
 
 \section{Experiment 3: Umfahren eines Hindernisses}
 \subsection{Aufgabenstellung}
-Das Fahrzeug soll mit Hilfe seiner Sensorik eine definierte Strecke abfahren und dabei ein fiktives Hindernis umfahren.
+Das Fahrzeug soll mit Hilfe seiner Sensorik eine definierte Strecke abfahren und dabei ein
+fiktives Hindernis umfahren.
 
 \subsection{Herangehensweise}
-Theoretisch besitzt der Roboter bereits alle nötigen Fähigkeiten, um auch einer abbiegenden Linie zu folgen. Allerdings wird ihn die Geschwindigkeit aus der Bahn werfen. Zu testen wäre also die größtmögliche Geschwindigkeit, bei der der Kurs verlässlich abgefahren werden kann. Diese Geschwindigkeit kann dann mit dem Erweitern des P-Controller zu einem PID-Controller verbessert werden.
+Theoretisch besitzt der Roboter bereits alle nötigen Fähigkeiten, um auch einer
+abbiegenden Linie zu folgen. Allerdings würde ihn die Geschwindigkeit aus der Bahn werfen.
+Zu testen wäre also die größtmögliche Geschwindigkeit, bei der der Kurs verlässlich
+abgefahren werden kann. Diese Geschwindigkeit kann dann mit dem Erweitern des P-Controller
+zu einem PID-Controller verbessert werden.
 
 \subsection{Herausforderungen bei der Problemlösung}
-Die richtigen Parameter für einen PID-Controller zu finden stellt sich als äußerst komplex dar. Scheinbar gibt es dabei auch keine Best-Practices sondern man muss einfach probieren. \enquote{Verlässliche} Einstellungen des Roboters definieren wird so, dass er den Kurs zehn mal in Folge erfolgreich absolvieren muss.
+Die richtigen Parameter für einen PID-Controller zu finden stellt sich als äußerst
+komplex dar. Scheinbar gibt es dabei auch keine Best-Practices sondern man muss einfach
+probieren. \enquote{Verlässliche Einstellungen} des Roboters definieren wird so, dass er
+den Kurs zehn mal in Folge erfolgreich absolvieren muss.
 
 \subsection{Auswertung}
-Für die Testläufe mit dem P-Controller erreichten wir eine maximale Geschwindigkeit von $100$. Diese konnten wir mit dem PID-Controller auf $140$ verbessern. Der Roboter absolvierte auch einzelne Testläufe mit höheren Geschwindigkeiten erfolgreich, jedoch nicht zuverlässig.
+Für die Testläufe mit dem P-Controller erreichten wir eine maximale Geschwindigkeit
+von $\SI{100}{\frac{\mm}{\s}}$. Diese konnten wir mit dem PID-Controller auf
+$\SI{140}{\frac{\mm}{\s}}$ verbessern. Der Roboter absolvierte auch einzelne Testläufe
+mit höheren Geschwindigkeiten erfolgreich, jedoch nicht zuverlässig.
 
-Tabelle \ref{table:zeitmessung3} enthält die Ergebnisse der Zeitmessung, auch hier liegen die Messergebnisse wieder stark beieinander. Allerdings unterscheiden sie sich, wie erwartet, stark von den vorherigen Experimenten. Mean und Standardabweichung haben sich in etwa verdoppelt.
+Tabelle \ref{table:zeitmessung3} enthält die Ergebnisse der Zeitmessung, auch hier
+liegen die Messergebnisse wieder stark beieinander. Allerdings unterscheiden sie sich,
+wie erwartet, stark von den vorherigen Experimenten. Der Mittelweit ist circa 2,5 und die
+Standardabweichung 1,6 mal größer.
 %
 \begin{table}[H]
     \centering
-    \begin{tabular}{|c|c|}
+    \begin{tabular}{|c|c|c|c|}
     \hline
-    Mean               & $\SI{13,53}{\mm}$ \\ \hline
-    Standardabweichung & $\SI{0,13}{\mm}$ \\ \hline
-    Min                & $\SI{13,26}{\mm}$ \\ \hline
-    Max                & $\SI{13,71}{\mm}$ \\ \hline
+                       & Experiment 1      & Experiment 2      & Experiment 3       \\ \hline
+    Mean               & $\SI{5,335}{\mm}$ & $\SI{5,343}{\mm}$ & $\SI{12,804}{\mm}$ \\ \hline
+    Standardabweichung & $\SI{0,013}{\mm}$ & $\SI{0,074}{\mm}$ & $\SI{0,119}{\mm}$  \\ \hline
+    Min                & $\SI{5,31}{\mm}$  & $\SI{5,225}{\mm}$ & $\SI{12,551}{\mm}$ \\ \hline
+    Max                & $\SI{5,36}{\mm}$  & $\SI{5,471}{\mm}$ & $\SI{12,977}{\mm}$ \\ \hline
     \end{tabular}
     \caption{Zeitmessung}
     \label{table:zeitmessung3}
 \end{table}
 %
-Weitere Optimierung sind möglich, indem man die Parameter des PID-Controllers verbessert. Jedoch ist nicht klar, wann ein Optimum erreicht ist und kann somit unendlich viel Zeit kosten. Des Weiteren hätte der Roboter einen Vorteil, wenn die Abbiegungen der Strecke eher Kurven wären oder zumindest einen stumpferen Winkel hätten. Leider kann der Roboter in diesem Versuchsaufbau keinen Nutzen aus seinem Ultraschallsensor ziehen. Sollte er auf ein Hindernis zufahren, würde er dies frühzeitig erkennen, seine Geschwindigkeit reduzieren, die Kurve sauber fahren und danach wieder beschleunigen. Falls in einem realen Szenario kein Hindernis im Weg sein sollte, sondern ausschließlich Einschränkungen der Route, könnte man dies dem Roboter über eine Karte, Matrix oder einen Graphen mitteilen, sodass er ebenfalls im Voraus auf Kurven reagieren kann.
+Weitere Optimierung sind möglich, indem man die Parameter des PID-Controllers verbessert.
+Jedoch ist nicht klar, wann ein Optimum erreicht ist und kann somit unendlich viel Zeit
+kosten. Des Weiteren hätte der Roboter einen Vorteil, wenn die Abbiegungen der Strecke
+etwas kurviger wären oder zumindest einen stumpferen anstatt eines rechten Winkels
+hätten. Leider kann der Roboter in diesem Versuchsaufbau keinen Nutzen aus seinem
+Ultraschallsensor ziehen. Sollte er auf ein Hindernis zufahren, würde er dies frühzeitig
+erkennen, seine Geschwindigkeit reduzieren, die Kurve sauber fahren und danach wieder
+beschleunigen. Falls in einem realen Szenario kein Hindernis im Weg sein sollte, sondern
+ausschließlich Einschränkungen der Route, könnte man dies dem Roboter über eine Karte,
+Matrix oder einen Graphen mitteilen, sodass er ebenfalls im Voraus auf Kurven reagieren
+kann.
 
 \chapter{Aufgabe 3}
 In der Aufgabenstellung werden Annahmen getroffen, welches das gesamte Konzept simplifizieren. Im Folgenden wollen wir betrachten, welche möglichen Auswirkungen die Realität auf das gegebene Szenario hat, wenn also diese Annahmen nicht mehr gemacht werden können.
