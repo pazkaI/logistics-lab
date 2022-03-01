@@ -597,59 +597,134 @@ Matrix oder einen Graphen mitteilen, sodass er ebenfalls im Voraus auf Kurven re
 kann.
 
 \chapter{Aufgabe 3}
-In der Aufgabenstellung werden Annahmen getroffen, welches das gesamte Konzept simplifizieren. Im Folgenden wollen wir betrachten, welche möglichen Auswirkungen die Realität auf das gegebene Szenario hat, wenn also diese Annahmen nicht mehr gemacht werden können.
+In der Aufgabenstellung werden Annahmen getroffen, welches das gesamte Konzept
+simplifizieren. Im Folgenden wollen wir betrachten, welche möglichen Auswirkungen die
+Realität auf das gegebene Szenario hat, wenn also diese Annahmen nicht mehr gemacht werden
+können.
 
 \section{Platzbedarf}
 \begin{displayquote}
-    ``Es befinden sich keine statischen oder dynamischen Hindernisse im Layout. [...] Die gesamte Fläche ist befahrbar. [...] Alle Fahrzeuge fahren auf direktem Weg zwischen den Maschinen (euklidische Distanz).'' \cite{aufgabenstellung}
+    ``Es befinden sich keine statischen oder dynamischen Hindernisse im Layout. [...]
+    Die gesamte Fläche ist befahrbar. [...] Alle Fahrzeuge fahren auf direktem Weg
+    zwischen den Maschinen (euklidische Distanz).'' \cite{aufgabenstellung}
 \end{displayquote}
 %
-Ein Unternehmen, welches autonome Transportsysteme so effizient wie möglich einsetzen möchte, wird sicherlich auch den zur Verfügung stehenden Platz in ihrer Logistikhalle sinnvoll nutzen wollen. Flächen frei zu lassen, nur damit die Fahrzeug nicht mit Hindernissen kollidieren können, stellt sich in den meisten Fällen wahrscheinlich aus unökonomisch heraus. Dynamische Hindernisse im Sinne anderer Roboter kann vergleichsweise einfach gelöst werden, indem die Fahrzeuge die Positionen der anderen Fahrzeuge übermittelt bekommen und dementsprechend reagieren können. Menschen als dynamische Hindernisse stellen sich womöglich als größeres Problem dar. Moderne Kamerasysteme können evtl. visuell ihre Umgebung wahrnehmen, Personen erkennen und bremsen bzw. ausweichen, jedoch ist das mit großen Kosten für Technik verbunden und das System muss einwandfrei funktionieren um Arbeitsunfälle zu vermeiden. Sollten Kamerasysteme solcher Art nicht zum Einsatz kommen, gebietet der Arbeitsschutz eine klare, mindestens visuelle, Abtrennung des Bereiches für die Fahrzeuge und des begehbaren Bereiches für Personen. Die kollidiert allerdings wiederum mit der Annahme, die gesamte Fläche sei befahrbar. Eine Mögliche Lösung wäre, das Transportsystem auf eine tiefer oder höher liegende Ebene zu verlegen. Somit wäre zumindest die Fahrzeug- und Personendomäne getrennt.
+Ein Unternehmen, welches autonome Transportsysteme so effizient wie möglich einsetzen
+möchte, wird sicherlich auch den zur Verfügung stehenden Platz in ihrer Logistikhalle
+sinnvoll nutzen wollen. Flächen frei zu lassen, nur damit die Fahrzeug nicht mit
+Hindernissen kollidieren können, stellt sich in den meisten Fällen wahrscheinlich aus
+unökonomisch heraus. Mit dynamischen Hindernissen, z.B. andere Roboter, kann
+vergleichsweise einfach gelöst werden, indem die Fahrzeuge die Positionen der anderen
+Fahrzeuge übermittelt bekommen und dementsprechend reagieren können. Menschen als
+dynamische Hindernisse stellen sich womöglich als größeres Problem dar. Moderne
+Kamerasysteme können evtl. visuell ihre Umgebung wahrnehmen, Personen erkennen und
+bremsen bzw. ausweichen, jedoch ist das mit großen Kosten für Technik verbunden und das
+System muss einwandfrei funktionieren um Arbeitsunfälle zu vermeiden. Sollten
+Kamerasysteme solcher Art nicht zum Einsatz kommen, gebietet der Arbeitsschutz eine
+klare, mindestens visuelle Abtrennung des Bereiches für die Fahrzeuge und des begehbaren
+Bereiches für Personen. Das kollidiert allerdings wiederum mit der Annahme, die gesamte
+Fläche sei befahrbar. Eine mögliche Lösung wäre, das Transportsystem auf eine tiefer
+oder höher liegende Ebene zu verlegen. Somit wäre zumindest die Fahrzeug- und
+Personendomäne getrennt.
 
 \section{Auftragszeit und -reihenfolge}
 \begin{displayquote}
-    ``Ein einzelner Auftrag hat keinen bestimmten Liefer- oder Abholzeitpunkt. [...] Die Aufträge sind homogen, d.h. es liegen keine geforderte Reihenfolge oder Priorisierung vor.'' \cite{aufgabenstellung}
+    ``Ein einzelner Auftrag hat keinen bestimmten Liefer- oder Abholzeitpunkt. [...] Die
+    Aufträge sind homogen, d.h. es liegen keine geforderte Reihenfolge oder Priorisierung
+    vor.'' \cite{aufgabenstellung}
 \end{displayquote}
 %
-Bei Unternehmen, in denen 24/7 gearbeitet wird, muss der Auftragspool entweder nach einer gewissen Zeit abgearbeitet sein und dann neu gestartet werden, was mit Overhead und damit Ineffizienz verbunden ist. Oder die zu transportierenden Güter bekommen ein weiteres Deadline-Attribut, welches im Scheduling-Algorithmus mit einbezogen werden muss. Unternehmen, bei denen das nicht der Fall ist, könnten ihren Zeithorizont der Arbeitszeit anpassen. Das bedeutet, am Ende des Tages ist der Aufgabenpool abgearbeitet. Allerdings können das zwischendrin keine neuen Aufträge eingepflegt werden und man kann nicht erwarten, dass bestimmt Aufträge eher fertig werden als andere. Dafür müssten diese Unternehmen dann ebenfalls den Auftragspool neu starten oder Prioritäten vergeben.
+Bei Unternehmen, in denen 24/7 gearbeitet wird, muss der Auftragspool entweder nach einer
+gewissen Zeit abgearbeitet sein und dann neu gestartet werden, was mit Overhead und damit
+Ineffizienz verbunden ist. Oder die zu transportierenden Güter bekommen ein weiteres
+Deadline-Attribut, welches im Scheduling-Algorithmus mit einbezogen werden muss.
+Unternehmen, bei denen das nicht der Fall ist, könnten ihren Zeithorizont der Arbeitszeit
+anpassen. Das bedeutet, am Ende des Tages ist der Aufgabenpool abgearbeitet. Allerdings
+können dann zwischendrin keine neuen Aufträge eingepflegt werden und man kann nicht
+erwarten, dass bestimmt Aufträge eher fertig werden als andere. Dafür müssten diese
+Unternehmen dann ebenfalls den Auftragspool neu starten oder Prioritäten vergeben.
 
 \section{Treibstoff und Verschleiß}
 \begin{displayquote}
-    ``Fahrzeuge sind zu 100\% einsatzbereit und fallen nie aus. [...] Fahrzeuge haben eine unendliche Reichweite, können also unendlich weit/lange fahren.'' \cite{aufgabenstellung}
+    ``Fahrzeuge sind zu 100\% einsatzbereit und fallen nie aus. [...] Fahrzeuge haben eine
+    unendliche Reichweite, können also unendlich weit/lange fahren.''
+    \cite{aufgabenstellung}
 \end{displayquote}
 %
-Da Verschleiß und Energievorrat immer eine Rollen spielen, kommt es in der Realität unvermeidlich zu Ausfällen. Selbst bei unseren Experimenten in Aufgabe 2 ist während der Durchführung der Roboter wegen zu niedrigem Akkustand ausgefallen. Man kann dies natürlich mit zusätzlicher Sensorik überwachen um rechtzeitig den Roboter zu warten. Allerdings bedeutet das an sich schon einen Ausfall für den Roboter und ist zusätzlich mit Hardware- und Personalkosten verbunden.
+Da Verschleiß und Energievorrat immer eine Rollen spielen, kommt es in der Realität
+unvermeidlich zu Ausfällen. Selbst bei unseren Experimenten in Aufgabe 2 ist während der
+Durchführung der Roboter wegen zu niedrigem Akkustand ausgefallen. Man kann dies natürlich
+mit zusätzlicher Sensorik überwachen um rechtzeitig den Roboter zu warten. Allerdings
+bedeutet das an sich schon einen Ausfall für den Roboter und ist zusätzlich mit Hardware-
+und Personalkosten verbunden.
 
 \section{Be- und Entladezeiten}
 \begin{displayquote}
-    ``Es fallen keine Tot-, Neben- und Handhabungszeiten an.'' \cite{aufgabenstellung}
+    ``Es fallen keine Tot-, Neben- und Handhabungszeiten an.''
+    \cite{aufgabenstellung}
 \end{displayquote}
 %
-Natürlich ist in der Realität das Be- und Entladen mit einem gewissen Zeitaufwand verbunden. Diesen kann man allerdings minimal und über verschiedene Maschinen hinweg gleich halten, wenn ein effizientes Be- und Entladungssystem zum Einsatz kommt.
+Natürlich ist in der Realität das Be- und Entladen mit einem gewissen Zeitaufwand
+verbunden. Diesen kann man allerdings minimal und über verschiedene Maschinen hinweg
+gleich halten, wenn ein effizientes Be- und Entladungssystem zum Einsatz kommt.
 
 \section{Fahrzeugkollisionen}
 \begin{displayquote}
-    ``Die Fahrzeuge sind dimensionslos, d.h. Es finden keine Konflikte zwischen den Fahrzeugen statt, womit keine Ausweichmanöver von Nöten sind.'' \cite{aufgabenstellung}
+    ``Die Fahrzeuge sind dimensionslos, d.h. Es finden keine Konflikte zwischen den
+    Fahrzeugen statt, womit keine Ausweichmanöver von Nöten sind.''
+    \cite{aufgabenstellung}
 \end{displayquote}
 %
-Wie die bereitgestellten Videos der Simulation gezeigt haben, ist diese Annahme weit von der Realität entfernt. Es wurden dabei ausschließlich Beschleunigung und Dimension der Roboter einbezogen, was bereits zu einer \SIrange{16}{65}{\percent} längeren Bearbeitungszeit führt. Bei der Kollisionsdetektion und des Ausweichmanövern gibt es eventuell noch etwas Verbesserungspotential. Des Weiteren könnte man einen Parameter hinzufügen, welcher die Anzahl an Kollisionen zählt und vom Algorithmus minimiert werden sollte. Jedoch führt eine minimal Kollisionszahl wahrscheinlich nicht immer zu besseren Zeiten, da die Roboter dann Umwege fahren müssten.
+Wie die bereitgestellten Videos der Simulation gezeigt haben, ist diese Annahme weit von
+der Realität entfernt. Es wurden dabei ausschließlich Beschleunigung und Dimension der
+Roboter einbezogen, was bereits zu einer \SIrange{16}{65}{\percent} längeren
+Bearbeitungszeit führt. Bei der Kollisionsdetektion und den Ausweichmanövern gibt es
+eventuell noch etwas Verbesserungspotential. Des Weiteren könnte man einen Parameter
+hinzufügen, welcher die Anzahl an Kollisionen zählt und vom Algorithmus minimiert werden
+sollte. Jedoch führt eine minimal Kollisionszahl wahrscheinlich nicht immer zu besseren
+Zeiten, da die Roboter dann Umwege fahren müssten.
 
 \section{Maschinenkollisionen}
 \begin{displayquote}
-    ``Die Maschinen sind dimensionslos, d.h. die Fahrzeuge fahren exakt zu den angegebenen Koordinaten der Maschinen, um ein Transportgut aufzunehmen oder abzugeben.'' \cite{aufgabenstellung}
+    ``Die Maschinen sind dimensionslos, d.h. die Fahrzeuge fahren exakt zu den
+    angegebenen Koordinaten der Maschinen, um ein Transportgut aufzunehmen oder
+    abzugeben.'' \cite{aufgabenstellung}
 \end{displayquote}
 %
-Mit hoher Wahrscheinlichkeit muss der Roboter in der Realität auch mal die ein oder andere Maschine umfahren. Wie die Erkenntnisse aus Aufgabe 2 zeigen, benötigt der Roboter beim Umfahren von Hindernissen im Vergleich zu einer geraden Strecke mindestens das 2,5fache der Zeit. Allerdings spielt die Dimension der Maschinen bei dem gegebenen Hallenlayout, und auch bei ähnlichen Layouts, eine relativ geringe Rolle. Die Koordinaten sind mehr oder weniger kreisförmig angeordnet, sodass eine Kollision mit einer Maschine womöglich vermieden werden kann, wenn sich die Roboter nur im Kreisinneren aufhalten. Allerdings führt, wie bereits beschrieben, ein möglichst freier Raum auf den Routen der Roboter zu großem Platzbedarf und somit erhöhten Kosten und Ineffizienzen.
+Mit hoher Wahrscheinlichkeit muss der Roboter in der Realität auch mal die ein oder
+andere Maschine umfahren. Wie die Erkenntnisse aus Aufgabe 2 zeigen, benötigt der Roboter
+beim Umfahren von Hindernissen im Vergleich zu einer geraden Strecke mindestens das
+2,5fache der Zeit. Allerdings spielt die Dimension der Maschinen bei dem gegebenen
+Hallenlayout, und auch bei ähnlichen Layouts, eine relativ geringe Rolle. Die Koordinaten
+sind mehr oder weniger kreisförmig angeordnet, sodass eine Kollision mit einer Maschine
+womöglich vermieden werden kann, wenn sich die Roboter nur im Kreisinneren aufhalten.
+Allerdings führt, wie bereits beschrieben, ein möglichst freier Raum auf den Routen der
+Roboter zu großem Platzbedarf und somit erhöhten Kosten und Ineffizienzen.
 
 \section{Beschleunigung}
 \begin{displayquote}
-    ``Fahrzeuge fahren durchgängig mit der maximalen Geschwindigkeit von 1 Streckeneinheit/Zeit.'' \cite{aufgabenstellung}
+    ``Fahrzeuge fahren durchgängig mit der maximalen Geschwindigkeit von 1
+    Streckeneinheit/Zeit.'' \cite{aufgabenstellung}
 \end{displayquote}
 %
-Aus hier gibt die Simulation Aufschluss über das Verhalten in der Realität. Wie viel des zusätzlichen Zeitbedarfs jeweils der Beschleunigung oder dem Kollidieren der Roboter zuzuschreiben ist, lässt sich schwer sagen. Fakt ist jedoch, das positive und negative Beschleunigung Zeit kosten. Mit stärkere Motorisierung und besseren Bremsen könnte dies verbessert werden, doch auch hier spielt die Kostenabwägung einer entscheidende Rolle. Ebenso zeigen die Ergebnisse der Experimente, dass ein Abbremsen vor dem Umfahren eines Hindernisses zu besseren Resultaten führt. Das würde natürlich die Anzahl an Beschleunigungsmanövern erneut erhöhen und müsste mit der Gesamtzeitersparnis ins Verhältnis gesetzt werden.
+Aus hier gibt die Simulation Aufschluss über das Verhalten in der Realität. Wie viel des
+zusätzlichen Zeitbedarfs jeweils der Beschleunigung oder dem Kollidieren der Roboter
+zuzuschreiben ist, lässt sich schwer sagen. Fakt ist jedoch, das positive und negative
+Beschleunigung Zeit kosten. Mit stärkerer Motorisierung und besseren Bremsen könnte dies
+verbessert werden, doch auch hier spielt die Kostenabwägung eine entscheidende Rolle.
+Ebenso zeigen die Ergebnisse der Experimente, dass ein Abbremsen vor dem Umfahren eines
+Hindernisses zu besseren Resultaten führen würde. Das erhöht natürlich die Anzahl an
+Beschleunigungsmanövern erneut und müsste mit der Gesamtzeitersparnis ins
+Verhältnis gesetzt werden.
 
 \section{Größe der Fahrzeugflotte}
-Die Ergebnisse in Aufgabe 1 deuten auf eine lineare Abnahme der Zeit mit steigender Roboteranzahl hin. Ein Fahrzeug pro Auftrag wäre also mit den getroffenen Annahmen die optimale Lösung. Jedoch werden viele der bereits genannten Probleme mit steigender Anzahl von Fahrzeugen verstärkt, sodass ab einer bestimmten Zahl die benötigte Zeit nicht mehr abnimmt und unter Umständen sogar steigt. Auch die Erhöhung der Maschinenanzahl kann hier nur bedingt Abhilfe schaffen, da sich dennoch viele Routen der Roboter kreuzen und die Kollisionsanzahl hoch bleibt.
+Die Ergebnisse in Aufgabe 1 deuten auf eine lineare Abnahme der Zeit mit steigender
+Roboteranzahl hin. Ein Fahrzeug pro Auftrag wäre also mit den getroffenen Annahmen die
+optimale Lösung. Jedoch werden viele der bereits genannten Probleme mit steigender Anzahl
+von Fahrzeugen verstärkt, sodass ab einer bestimmten Zahl die benötigte Zeit nicht mehr
+abnimmt und unter Umständen sogar steigt. Auch die Erhöhung der Maschinenanzahl kann hier
+nur bedingt Abhilfe schaffen, da sich dennoch viele Routen der Roboter kreuzen und die
+Kollisionsanzahl hoch bleibt.
 
 \bibliographystyle{unsrt}
 \bibliography{bibliography}
