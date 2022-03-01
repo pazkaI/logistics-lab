@@ -520,9 +520,14 @@ Proportional-Controller genutzt. Ein PID-Controller würde vermutlich für kaum 
 Verbesserung sorgen, steigert die Komplexität allerdings extrem. Damit der Farbsensor
 möglichst aussagekräftige und unterscheidbare Werte liefert, nutzen wir weißes Tape auf
 einem schwarzen Tisch, was für starke Kontraste sorgt.
-
-\includegraphics[scale=0.5]{src/images/robot_front.jpg}
-
+%
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.5]{src/images/robot_front.jpg}
+    \caption{Roboter mit Color Sensor}
+    \label{figure:roboter_mit_color_sensor}
+\end{figure}
+%
 \subsection{Herausforderungen bei der Problemlösung}
 Die größte Schwierigkeit bei dieser Aufgabe besteht in der Kalibrierung des P-Controllers.
 Allerdings lässt sich bei nur einer Regelgröße relativ schnell ein geeigneter Parameter
