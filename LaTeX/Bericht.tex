@@ -282,9 +282,9 @@ Vergleicht man die Ergebnisse, so erkennt man in der Gegenüberstellung
 \ref{table:compare-strategies}, dass der erste Greedy-Ansatz kaum eine Verbesserung
 gegenüber dem Kürzeste-Distanz Ansatz bringt.
 Jedoch die verbesserte Version beiden deutlich überlegen ist.
-Der \emph{Ruin-and-Recreate}-Ansatz mit 64 Iterationen ist noch um $\approx \SI{3.85}{\percent}$ besser als
+Der \emph{Ruin-and-Recreate}-Ansatz mit 64 Iterationen ist noch um $\approx \SI{3.08}{\percent}$ besser als
 der zweite Greedy-Ansatz, jedoch auf Kosten einer höheren
-Laufzeit (\SI{0.25}{\s} vs. \SI{3}{\s}).
+Laufzeit (\SI{0.25}{\s} vs. \SI{2.8}{\s}).
 
 \begin{table}[H]
     \centering
@@ -293,9 +293,9 @@ Laufzeit (\SI{0.25}{\s} vs. \SI{3}{\s}).
     Strategie & \multicolumn{1}{c|}{1} & \multicolumn{1}{c|}{2.1} & \multicolumn{1}{c|}{2.2}
                                                                                         \\ \hline
     1         & 0                      & -                        & -                   \\ \hline
-    2.1       & \SI{ 1.83}{\percent}   & 0                        & -                   \\ \hline
-    2.2       & \SI{ 9.04}{\percent}   & \SI{ 7.35}{\percent}     & 0                   \\ \hline
-    3         & \SI{12.53}{\percent}   & \SI{10.91}{\percent}     & \SI{3.85}{\percent} \\ \hline
+    2.1       & \SI{ 1.62}{\percent}   & 0                        & -                   \\ \hline
+    2.2       & \SI{ 9.98}{\percent}   & \SI{ 7.48}{\percent}     & 0                   \\ \hline
+    3         & \SI{11.78}{\percent}   & \SI{10.33}{\percent}     & \SI{3.08}{\percent} \\ \hline
     \end{tabular}
     \caption{Verbesserung der Ergebnisse, gemittelt aus den Verbesserungen der jeweiligen
     Ergebnissen (ein, drei und fünf Fahrzeuge).}

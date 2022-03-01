@@ -19,6 +19,8 @@ MakeIndex=
 QuickBuild=
 
 [item:Bericht]
+archive=true
+encoding=
 highlight=None
 mode=Normal
 
